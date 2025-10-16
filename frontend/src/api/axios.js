@@ -1,13 +1,8 @@
 import axios from "axios";
 import config from "../../config";
 
-const baseURL =
-  window.location.hostname === "localhost"
-    ? config.LOCAL_API
-    : config.MOBILE_API;
-
 const api = axios.create({
-  baseURL: baseURL,
+  baseURL: config.API_URL,
   withCredentials: true,
 });
 

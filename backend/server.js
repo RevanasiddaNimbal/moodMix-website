@@ -15,7 +15,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://192.168.137.1:5173",
-      "https://mood-based-audio-and-video-player.onrender.com",
+      "https://moodmix.onrender.com",
     ],
     credentials: true,
   })
