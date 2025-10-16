@@ -1,0 +1,289 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0ea5e9, #10b981, #f59e0b);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(
+      1px 1px at 130px 80px,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    ),
+    radial-gradient(2px 2px at 160px 30px, #fff, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: sparkle 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes sparkle {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(200px);
+  }
+}
+
+.faceIcon {
+  font-size: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faceIcon::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  border-style: dashed;
+  animation: rotate 3s linear infinite;
+}
+
+.faceSearching::before {
+  border-color: rgba(255, 255, 255, 0.4);
+  animation: rotate 3s linear infinite, pulse-border 2s ease-in-out infinite;
+}
+
+.faceDetected::before {
+  border-color: #10b981;
+  border-style: solid;
+  animation: none;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-border {
+  0%,
+  100% {
+    border-width: 2px;
+    opacity: 0.6;
+  }
+  50% {
+    border-width: 4px;
+    opacity: 1;
+  }
+}
+
+.status {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 3rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  z-index: 2;
+  position: relative;
+}
+
+.webcamPulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6),
+      0 0 30px rgba(0, 188, 212, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+}
+
+.cardsWrapper {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1200px;
+}
+
+.card {
+  width: 180px;
+  height: 200px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.card.selected {
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+    0 0 60px rgba(255, 255, 255, 0.4);
+  border: 2px solid white;
+}
+
+.happy {
+  background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%);
+}
+
+.sad {
+  background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+}
+
+.calm {
+  background: linear-gradient(135deg, #66bb6a 0%, #388e3c 100%);
+}
+
+.angry {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+}
+
+.exited {
+  background: linear-gradient(135deg, #ab47bc 0%, #7b1fa2 100%);
+}
+
+.cardIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.shape {
+  font-size: 40px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.cardLabel {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .faceIcon {
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+
+  .status {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+
+  .cardsWrapper {
+    gap: 15px;
+  }
+
+  .card {
+    width: 140px;
+    height: 160px;
+  }
+
+  .cardIcon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+  }
+
+  .shape {
+    font-size: 30px;
+  }
+
+  .cardLabel {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardsWrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .card {
+    width: 280px;
+    height: 120px;
+    flex-direction: row;
+    padding: 0 20px;
+  }
+}
+
+.container::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(156, 39, 176, 0.3) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}

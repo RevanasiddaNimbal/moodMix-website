@@ -1,0 +1,96 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  color: #222;
+  line-height: 1.7;
+  padding: 1rem;
+  margin: 0 auto;
+  max-width: 900px;
+  background-color: rgba(255, 255, 255, 0.324);
+}
+.logoSection {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+  margin-left: -150px;
+}
+.logoSection:hover {
+  transform: scale3d(1.03);
+}
+
+.logo {
+  height: 40px;
+  width: 40px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #34d399;
+  margin-right: 4px;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #34d399;
+  text-shadow: 0 0 6px rgba(52, 211, 153, 0.355);
+}
+.content {
+  flex: 1;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+p {
+  margin: 0.6rem 0;
+}
+
+a {
+  color: #0073e6;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.footer {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-top: 1px solid #ddd;
+  font-size: 0.95rem;
+}
+
+.footer h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.footer p {
+  margin: 0.4rem 0;
+}
+
+@media (max-width: 768px) {
+  .logoSection {
+    margin-left: 0px;
+  }
+}
+@media (max-width: 480px) {
+  .logoSection {
+    margin-left: 0px;
+  }
+}

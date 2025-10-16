@@ -1,0 +1,169 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    rgba(26, 38, 84, 0.792) 0%,
+    rgba(31, 42, 95, 0.839) 40%,
+    rgba(60, 80, 160, 0.92) 100%
+  );
+  font-family: "Spline Sans", sans-serif;
+  color: #f4f5f7;
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    background-color: rgba(18, 26, 58, 0.927);
+    color: #e5e7eb;
+  }
+}
+
+.main {
+  position: relative;
+  z-index: 10;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #f5f0f0;
+}
+
+.header p {
+  font-size: 1.125rem;
+  color: #f8f9fc;
+  margin-top: 0.75rem;
+  max-width: 32rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.cards {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 45hw;
+  transition: all 0.3s ease;
+}
+
+.cards:hover {
+  transform: scale(1.01);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.cards img {
+  width: 130px;
+  height: 130px;
+  border-radius: 1rem;
+  object-fit: cover;
+  margin-bottom: 1.5rem;
+}
+
+.cards h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #fafbfd;
+}
+
+.cards p {
+  font-size: 1rem;
+  color: #f1f2f4;
+  margin-top: 0.5rem;
+  max-width: 360px;
+  text-align: center;
+}
+
+.cards button {
+  margin-top: 1.5rem;
+  background-color: #506cf6;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  margin-left: 18px;
+  transition: all 0.3s ease;
+}
+
+.cards button:hover {
+  background-color: #2e27eba3;
+  transform: scale(1.03);
+}
+
+.musicCard {
+  background: rgba(96, 122, 251, 0.05);
+  /* width: 45em; */
+}
+
+.videoCard {
+  background: rgba(255, 255, 255, 0);
+}
+
+.exerciseCard {
+  background: rgba(96, 122, 251, 0.08);
+}
+
+@media (min-width: 768px) {
+  .cards {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .cards img {
+    margin-bottom: 0;
+    margin-right: 2rem;
+  }
+
+  .cards p {
+    text-align: left;
+  }
+
+  .cards button {
+    margin-top: 0;
+    align-self: center;
+  }
+}
+@media (max-width: 767px) {
+  .cards {
+    flex-direction: column; /* stack image + content vertically */
+    align-items: center; /* center everything */
+    text-align: center; /* text centered inside card */
+  }
+
+  .cards img {
+    margin-bottom: 1rem; /* space below image */
+    margin-right: 0; /* remove right margin for vertical layout */
+  }
+
+  .cards p {
+    text-align: center; /* ensure paragraph is centered */
+  }
+
+  .cards button {
+    margin-left: 0; /* center button horizontally */
+    margin-top: 1rem; /* spacing from content */
+  }
+}

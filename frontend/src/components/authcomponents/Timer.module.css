@@ -1,0 +1,18 @@
+.resendText {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #353434;
+  text-align: center;
+}
+
+.timer {
+  font-weight: bold;
+  color: #e63939a5;
+  margin-left: 12px;
+}
+
+.timeoff {
+  font-weight: bold;
+  color: #e2d20eaa;
+  margin-left: 12px;
+}

@@ -1,0 +1,22 @@
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px auto;
+  max-width: 900px;
+  padding: 0 16px;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  color: #ccc;
+  margin-top: 50px;
+  font-size: 18px;
+}
+
+.empty img {
+  width: 150px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+}

@@ -1,0 +1,49 @@
+.item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #ffffffdb;
+  border-radius: 17px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.item:hover {
+  background: #6aeed1cd;
+  transform: scale(1.02);
+  border: 1px solid #f1c31efa;
+}
+
+.active {
+  background: #1db95433;
+  border: 1px solid #1db954;
+}
+
+.cover {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-right: 16px;
+}
+
+.info h4 {
+  margin: 0;
+  font-size: 16px;
+  max-width: 700px;
+  font-weight: 550;
+}
+
+.info p {
+  margin: 2px 0 0 0;
+  font-size: 14px;
+  color: rgb(0 0 0 / 38%);
+}
+
+.duration {
+  margin-left: auto;
+  font-size: 15px;
+  color: #1f2937ba;
+}

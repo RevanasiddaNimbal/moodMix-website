@@ -1,0 +1,123 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url("https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1920&q=80");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 1rem;
+}
+
+.otpCard {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2rem 1.5rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: scaleUp 0.3s ease-in-out;
+  backdrop-filter: blur(5px);
+}
+
+.title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.input {
+  width: 90%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #dcdde1b0;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  text-align: center;
+  background: rgba(249, 249, 249, 0.3);
+  outline: none;
+  margin-bottom: 1rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, 0.25s ease;
+}
+
+.input:focus {
+  background-color: rgba(249, 249, 249, 0.4);
+  border-color: #6c63ff;
+  box-shadow: 0 0 0.375rem rgba(122, 116, 243, 0.3);
+}
+
+.timer {
+  font-weight: bold;
+  color: #e63939a5;
+  margin-bottom: 0.75rem;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 0.625rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.resendBtn,
+.verifyBtn {
+  background-color: rgba(244, 121, 49, 0.6);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 0.625rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 6rem;
+}
+
+.resendBtn:hover,
+.verifyBtn:hover {
+  background: rgba(243, 110, 39, 0.65);
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.75rem rgba(237, 121, 58, 0.68);
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .otpCard {
+    padding: 1.5rem 1rem;
+    width: 95%;
+  }
+  .title {
+    font-size: 1.25rem;
+  }
+  .input {
+    font-size: 0.9rem;
+    padding: 0.65rem 0.85rem;
+  }
+  .resendBtn,
+  .verifyBtn {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.85rem;
+    min-width: 5rem;
+  }
+  .timer {
+    font-size: 0.875rem;
+  }
+}

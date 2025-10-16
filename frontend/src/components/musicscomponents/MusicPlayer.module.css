@@ -1,0 +1,494 @@
+.playerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1f2937;
+  color: white;
+  padding: 10px 16px;
+  width: 100%;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.playerContainer[data-collapsed="true"] {
+  cursor: pointer;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 150px;
+  max-width: 30%;
+  overflow: hidden;
+}
+
+.cover {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.info h4 {
+  font-size: 14px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info p {
+  font-size: 12px;
+  opacity: 0.7;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.time {
+  font-size: 12px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.seekbar {
+  flex: 1;
+  position: relative;
+  height: 6px;
+  background: #374151;
+  border-radius: 999px;
+  cursor: pointer;
+  max-width: 300px;
+}
+
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 999px;
+}
+
+.seekThumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.likeDislike {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-right: 12px;
+}
+
+.likeDislike button {
+  all: unset; /* resets all browser styles */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+.likeDislike button:hover {
+  transform: scale(1.1);
+}
+
+.likeDislike svg {
+  width: 28px;
+  height: 28px;
+}
+
+.likeDislike .active svg {
+  color: #22c55e;
+  stroke: #22c55e;
+}
+
+.volumeWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 120px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.muteButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.volumeContainer {
+  position: relative;
+  width: 80px;
+  height: 6px;
+  background: #374151;
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.volumeWrapper:hover .volumeContainer {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.volumeFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 999px;
+}
+
+.volumeThumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.volumeLabel {
+  font-size: 12px;
+}
+
+.speedMenuWrapper {
+  position: relative;
+}
+
+.speedButton {
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.speedMenu {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  gap: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 101;
+}
+
+.speedItem {
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.speedItemActive {
+  background: #22c55e;
+  color: #111827;
+}
+
+.detailsToggle {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  display: none; /* hidden by default; shown on mobile via media query */
+}
+
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.overlayBackdrop {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  filter: blur(30px);
+  transform: scale(1.1);
+  opacity: 0.4;
+}
+
+.overlayInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 24px 20px 28px;
+  color: #f9fafb;
+}
+
+.overlayTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 32px;
+}
+
+.overlayClose {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: #e5e7eb;
+  background: rgba(17, 24, 39, 0.6);
+}
+
+.overlayCover {
+  width: min(78vw, 320px);
+  height: min(78vw, 320px);
+  object-fit: cover;
+  border-radius: 14px;
+  align-self: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  margin-top: 8px;
+}
+
+.overlayInfo {
+  margin-top: 18px;
+  text-align: left;
+}
+
+.overlayTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.overlayArtist {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.overlaySeekSection {
+  margin-top: 18px;
+}
+
+.seekbarLarge {
+  height: 8px;
+  max-width: none;
+  background: rgba(55, 65, 81, 0.8);
+}
+
+.seekbarLarge .progress {
+  height: 8px;
+  background: #ffffff;
+}
+
+.seekbarLarge .seekThumb {
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+}
+
+.overlayTimes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #e5e7eb;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.overlayControls {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding-bottom: 8px;
+}
+
+.smallControl {
+  all: unset;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #e5e7eb;
+  background: rgba(17, 24, 39, 0.6);
+  font-size: 20px;
+}
+
+.playCircle {
+  all: unset;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 768px) {
+  .playerContainer {
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 12px;
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0; /* Prevent shrinking */
+    width: 60%; /* Fixed width for left section */
+    overflow: hidden;
+  }
+
+  .cover {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .info {
+    overflow: hidden;
+    flex-shrink: 1;
+    min-width: 0; /* necessary for text-overflow to work in flex */
+  }
+
+  .info h4,
+  .info p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+  }
+
+  .controls {
+    gap: 12px;
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .controls > button:not(.prev):not(.play):not(.next) {
+    display: none;
+  }
+
+  .seekbar,
+  .time {
+    display: none;
+  }
+
+  .likeDislike,
+  .volumeWrapper,
+  .speedMenuWrapper {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .speedMenu {
+    bottom: 140%;
+  }
+
+  .detailsToggle {
+    display: none;
+  }
+
+  .mobileOverlay {
+    display: none;
+  }
+}
+.fullscreen-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #111;
+  color: white;
+}
+
+.fullscreenBtn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  transition: transform 0.2s ease;
+}
+
+.fullscreenBtn:hover {
+  transform: scale(1.1);
+}
