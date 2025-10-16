@@ -7,6 +7,7 @@ const app = express();
 const authentication = require("./router/userAuth");
 const playmusic = require("./router/music");
 const exercises = require("./router/exercise");
+const videos = require("./router/video");
 
 const port = process.env.PORT || 5000;
 
@@ -27,6 +28,7 @@ app.use(cookieParser());
 app.use("/api", exercises);
 app.use("/api/auth", authentication);
 app.use("/api/musics", playmusic);
+app.use("/api/videos", videos);
 
 app.get("/", (req, res) => {
   res.status(200).send("hello from server");

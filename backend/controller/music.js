@@ -44,7 +44,27 @@ const moodMusicMap = {
     "Yo Yo Honey Singh - Desi Kalakaar (Hindi)",
   ],
 };
+const fetchMusics = async (musics) => {
+  const moodmusics = [];
+  for (const music of musics) {
+    const response = await musicAPI.get("/search/tracks", {
+      params: {
+        q: music,
+        client_id: process.env.CLIENT_ID,
+        limit: 30,
+      },
+    });
+    if (response.data && response.data.collection) {
+      moodmusics.push(...response.data.collection);
+    }
+  }
+  const uniqueTracks = {};
+  moodmusics.forEach((track) => {
+    uniqueTracks[track.id] = track;
+  });
 
+  return Object.values(uniqueTracks);
+};
 exports.getMusics = async (req, res, next) => {
   const query = req.body?.q?.trim();
   const mood = req.body?.mood;
@@ -55,58 +75,19 @@ exports.getMusics = async (req, res, next) => {
       const response = await musicAPI.get("/search/tracks", {
         params: {
           q: query,
-          client_id: process.env.CLIENT_ID,
           limit: 30,
         },
       });
-      data = response.data;
+      data = response.data.collection;
     } else if (mood && moodMusicMap[mood]) {
-      const musics = moodMusicMap[mood] || moodMusicMap["calm"];
-      let moodMusics = [];
-
-      for (const music of musics) {
-        const response = await musicAPI.get("/search/tracks", {
-          params: {
-            q: music,
-            client_id: process.env.CLIENT_ID,
-            limit: 30,
-          },
-        });
-        if (response.data && response.data.collection) {
-          moodMusics.push(...response.data.collection);
-        }
-      }
-
-      const uniqueTracks = {};
-      moodMusics.forEach((track) => {
-        uniqueTracks[track.id] = track;
-      });
-
-      data = { collection: Object.values(uniqueTracks) };
+      const musics = moodMusicMap[mood];
+      data = await fetchMusics(musics);
     } else {
       const musics = moodMusicMap["calm"];
-      const moodmusics = [];
-      for (const music of musics) {
-        const response = await musicAPI.get("/search/tracks", {
-          params: {
-            q: music,
-            client_id: process.env.CLIENT_ID,
-            limit: 30,
-          },
-        });
-        if (response.data && response.data.collection) {
-          moodmusics.push(...response.data.collection);
-        }
-      }
-      const uniqueTracks = {};
-      moodmusics.forEach((track) => {
-        uniqueTracks[track.id] = track;
-      });
-
-      data = { collection: Object.values(uniqueTracks) };
+      data = await fetchMusics(musics);
     }
 
-    if (!data || !data.collection || data.collection.length === 0) {
+    if (!data || !data.length) {
       return res.status(500).json({
         success: false,
         error: "No songs found",
@@ -115,7 +96,7 @@ exports.getMusics = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: data.collection,
+      data: data,
     });
   } catch (err) {
     console.error(err.stack);
@@ -126,11 +107,7 @@ exports.getMusics = async (req, res, next) => {
 exports.getTrackInfo = async (req, res, next) => {
   try {
     const trackId = req.params.id;
-    const response = await musicAPI.get(`/tracks/${trackId}`, {
-      params: {
-        client_id: process.env.CLIENT_ID,
-      },
-    });
+    const response = await musicAPI.get(`/tracks/${trackId}`);
     if (!response.data) {
       return res.status(500).json({
         success: false,

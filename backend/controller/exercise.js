@@ -7,9 +7,9 @@ const moodMap = {
   excited: ["quads", "hamstrings", "lats"], // full-body dynamic targets
 };
 const cache = {};
-function setCache(endpoint, data, ttl = 600000) {
+function setCache(endpoint, data) {
   cache[endpoint] = data;
-  setTimeout(() => delete cache[endpoint], ttl);
+  setTimeout(() => delete cache[endpoint], 600000);
 }
 
 async function fetchExercises(endpoint) {
@@ -35,8 +35,6 @@ exports.getExercises = async (req, res) => {
     let exercises = [];
     const query = q?.trim().toLowerCase() || "";
     const moodValue = mood?.trim().toLowerCase() || "";
-
-    console.log(query, moodValue);
 
     if (query && /^[a-zA-Z\s]+$/.test(query)) {
       let byName = await fetchExercises(`/name/${query}`);
