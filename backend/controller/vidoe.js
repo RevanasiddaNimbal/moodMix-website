@@ -36,13 +36,25 @@ const moodVedeosMap = {
     "party hits mix",
   ],
 };
+const cache = {};
+function setCache(cacheKey, data) {
+  cache[cacheKey] = data;
+  setTimeout(() => delete cache[cacheKey], 600000);
+}
 
-const fetchVideos = async (Videos) => {
+const fetchVideos = async (videoList) => {
+  const cacheKey = videoList.slice(0, 1);
+  if (cache[cacheKey]) {
+    console.log("Using cached data for:", cacheKey);
+    return cache[cacheKey];
+  }
+
   const moodVideos = [];
-  for (const video of Videos.slice(0, 2)) {
+  for (const video of videoList.slice(0, 2)) {
     const response = await videoAPI.get("/search", {
-      params: { part: "snippet", q: video, type: "videos", maxResults: 5 },
+      params: { part: "snippet", q: video, type: "video", maxResults: 5 },
     });
+    console.log("Request sent :", video);
     if (response.data && response.data.items) {
       moodVideos.push(...response.data.items);
     }
@@ -53,7 +65,9 @@ const fetchVideos = async (Videos) => {
     uniqueVideos[video.id.videoId] = video;
   });
 
-  return Object.values(uniqueVideos);
+  const finalVideos = Object.values(uniqueVideos);
+  setCache(cacheKey, finalVideos);
+  return finalVideos;
 };
 exports.getVideos = async (req, res, next) => {
   const { q, mood } = req.query;

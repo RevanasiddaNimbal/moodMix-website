@@ -70,7 +70,7 @@
   align-items: center;
   background-color: #1f2937;
   border-radius: 30px;
-  padding: 5px 10px;
+  padding: 4px 10px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
 }
@@ -87,7 +87,7 @@
   color: white;
   font-size: 0.95rem;
   padding: 5px;
-  width: 290px;
+  width: 340px;
   transition: width 0.3s ease;
 }
 
@@ -100,6 +100,7 @@
   border: none;
   color: #9ca3af;
   cursor: pointer;
+  width: 18px;
   font-size: 1.1rem;
   transition: color 0.3s ease;
 }
@@ -110,7 +111,7 @@
 
 .navLinks {
   display: flex;
-  gap: 24px;
+  gap: 30px;
   list-style: none;
 }
 
@@ -185,7 +186,7 @@
 }
 
 .hamburger {
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: space-between;
   width: 28px;
@@ -326,6 +327,7 @@
   .searchBtn {
     font-size: 1.1rem;
     padding-left: 6px;
+    width: 24px;
   }
 
   .hamburger {
@@ -372,7 +374,7 @@
   }
 
   .searchWrapper {
-    padding: 6px 8px;
+    padding: 0px 5px;
   }
 
   .searchBox {
@@ -408,11 +410,8 @@
   .mobileSidebar {
     width: 200px;
   }
-}
-
-@media (min-width: 1025px) {
   .hamburger {
-    display: flex;
+    display: none;
   }
 }
 

@@ -1,0 +1,144 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+  background-color: #0f0f0f;
+  color: #fff;
+}
+
+.mainSection {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.videoFrame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.videoInfo {
+  margin-top: 16px;
+}
+
+.videoTitle {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+
+.channelTitle {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.videoDescription {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #ccc;
+}
+
+.sideSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.nextHeading {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.videoList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.videoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  background: #1a1a1a;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.videoItem:hover {
+  background: #272727;
+}
+
+.thumbnail {
+  width: 120px;
+  height: 70px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.videoText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.channel {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.noVideo {
+  text-align: center;
+  padding: 40px;
+  color: #aaa;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sideSection {
+    flex-direction: row;
+    overflow-x: scroll;
+  }
+
+  .videoList {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .videoItem {
+    flex-direction: column;
+    width: 160px;
+  }
+
+  .thumbnail {
+    width: 100%;
+    height: 90px;
+  }
+}

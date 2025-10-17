@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "../../api/axios";
+import musicAPI from "../../api/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ExerciseList.module.css";
-import { DiscAlbum } from "lucide-react";
 
 export default function ExerciseList() {
   const [exercises, setExercises] = useState([]);
@@ -18,11 +17,10 @@ export default function ExerciseList() {
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const res = await axios.get(`/exercises`, {
+        const res = await musicAPI.get(`/exercises`, {
           params: { q: query, mood },
         });
         setExercises(res.data || []);
-        console.log(res.data);
       } catch (err) {
         console.error("Error fetching exercises:", err);
         setExercises([]);
@@ -39,7 +37,7 @@ export default function ExerciseList() {
       const newImages = {};
       for (const exercise of exercises) {
         try {
-          const res = await axios.get(`/exercise-image?id=${exercise.id}`, {
+          const res = await musicAPI.get(`/exercise-image?id=${exercise.id}`, {
             responseType: "blob",
           });
           const url = URL.createObjectURL(res.data);

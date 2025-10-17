@@ -14,10 +14,12 @@ import Navbar from "./components/usercomponent/Navbar";
 import Contact from "./components/usercomponent/Contact";
 import VerifyOtp from "./components/authcomponents/VerifyOtp";
 import RegisterForm from "./components/authcomponents/RegisterForm";
-import MusicPage from "./pages/MusicPage";
+import MusicPage from "./pages/Music";
 import ExerciseList from "./components/ExerciseComponents/ExerciseList";
 import ChooseVibe from "./components/usercomponent/ChooseVibe";
 import ExerciseDetails from "./components/ExerciseComponents/ExerciseDetail";
+import Video from "./pages/Videos";
+import VideoPlayer from "./components/videocomponents/VideoPlayer";
 
 function AppWrapper() {
   const location = useLocation();
@@ -47,6 +49,8 @@ function AppWrapper() {
         <Route path="/musics" element={<MusicPage />} />
         <Route path="/exercise" element={<ExerciseList />} />
         <Route path="/exercise/:id" element={<ExerciseDetails />} />
+        <Route path="/videos" element={<Video />} />
+        <Route path="/videos/watch/:id" element={<VideoPlayer />} />
       </Routes>
     </>
   );

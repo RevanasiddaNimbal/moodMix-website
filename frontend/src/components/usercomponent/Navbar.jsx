@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 import styles from "./Navbar.module.css";
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
@@ -135,6 +136,8 @@ export default function Navbar() {
             isAuthed ? styles.authSearchWrapper : ""
           }`}
         >
+          <Search className={styles.searchBtn} onClick={handleSearch} />
+
           <input
             type="text"
             placeholder="Search music or videos..."
@@ -145,9 +148,6 @@ export default function Navbar() {
             onChange={(e) => setquery(e.target.value)}
             onKeyPress={handleKeyPress}
           />
-          <button className={styles.searchBtn} onClick={handleSearch}>
-            🔍
-          </button>
         </div>
 
         <ul
