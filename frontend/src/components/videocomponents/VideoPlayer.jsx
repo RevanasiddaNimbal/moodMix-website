@@ -1,36 +1,49 @@
 import styles from "./VideoPlayer.module.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import YouTube from "react-youtube";
 
 export default function VideoPlayer() {
   const location = useLocation();
 
-  const selected = location.state?.selected;
+  let initSelected = location.state?.selected;
   const videos = location.state?.videos;
-  const videoId = selected?.id?.videoId;
 
+  const [selected, setSelected] = useState(initSelected);
+
+  const snippet = selected.snippet || {};
+  const videoId = selected?.id?.videoId;
   if (!selected || !videoId || !videos) {
     return <p className={styles.noVideo}>Select a video to play</p>;
   }
 
-  const snippet = selected.snippet || {};
+  const nextVideos = videos?.filter((v) => v?.id?.videoId);
+  const handleClick = (video) => {
+    setSelected(video);
+  };
+  const opts = {
+    height: "100%",
+    width: "100%",
+    playerVars: {
+      autoplay: 1,
+      controls: 1,
+      rel: 1,
+      modestbranding: 1,
+      disablekb: 1,
+      fs: 1,
+    },
+  };
 
-  const nextVideos = videos?.filter(
-    (v) => v?.id?.videoId && v.id.videoId !== videoId
-  );
-  console.log(nextVideos);
   return (
     <div className={styles.container}>
-      {/* Left side - main video */}
       <div className={styles.mainVideo}>
-        <iframe
-          width="100%"
-          height="400"
-          src={`https://www.youtube.com/embed/${videoId}`}
-          title={snippet.title || "YouTube video player"}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+        <div className={styles.playerWrapper}>
+          <YouTube
+            videoId={videoId}
+            opts={opts}
+            className={styles.youtubePlayer}
+          />
+        </div>
 
         {/* Video info */}
         <div className={styles.info}>
@@ -53,7 +66,13 @@ export default function VideoPlayer() {
           <p>No other videos found.</p>
         ) : (
           nextVideos?.map((video) => (
-            <div key={video.id.videoId} className={styles.videoItem}>
+            <div
+              key={video.id.videoId}
+              className={`${styles.videoItem} ${
+                video.id.videoId === videoId ? styles.selected : ""
+              }`}
+              onClick={() => handleClick(video)}
+            >
               <img
                 src={video.snippet.thumbnails.default.url}
                 alt={video.snippet.title}

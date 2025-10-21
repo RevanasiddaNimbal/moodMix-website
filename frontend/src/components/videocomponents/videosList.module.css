@@ -1,8 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 .container {
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  font-family: "Poppins", sans-serif;
   padding: 20px;
-  background-color: #f9f9f9;
   min-height: 100vh;
-  transition: background 0.3s;
+  transition: 0.3s;
 }
 
 .noVideos {
@@ -21,7 +23,8 @@
 }
 
 .videoCard {
-  background-color: #fff;
+  background: rgb(243, 241, 231);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

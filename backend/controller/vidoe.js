@@ -15,11 +15,10 @@ const moodVedeosMap = {
     "melancholic music mix",
   ],
   calm: [
-    "relaxing nature videos",
+    "peaceful instrumental music",
     "meditation videos",
     "calm study videos",
     "lofi chill beats playlist",
-    "peaceful instrumental music",
   ],
   angry: [
     "intense motivational videos",
@@ -78,7 +77,7 @@ exports.getVideos = async (req, res, next) => {
   try {
     if (query) {
       const response = await videoAPI.get("/search", {
-        params: { part: "snippet", q: query, type: "videos", maxResults: 5 },
+        params: { part: "snippet", q: query, type: "videos", maxResults: 50 },
       });
 
       result = response.data.items;
