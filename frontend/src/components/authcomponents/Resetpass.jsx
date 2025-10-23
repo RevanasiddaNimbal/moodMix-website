@@ -2,6 +2,7 @@ import styles from "./Resetpass.module.css";
 import { useState } from "react";
 import axios from "../../api/axios";
 import { useNavigate } from "react-router-dom";
+import { showMessage } from "../Message";
 
 export default function Resetpassword() {
   const [User, setUser] = useState({
@@ -18,16 +19,18 @@ export default function Resetpassword() {
     try {
       const res = await axios.post("/auth/reset-password", User);
       if (res.status === 200 || res.success) {
-        alert(
+        await showMessage(
           res.data.message || "Password reseted successful. Please login again"
         );
         navigate("/login");
       }
     } catch (err) {
       if (err.response?.status == 401) {
-        alert("You are not logged in. Please log in to continue.");
+        await showMessage("You are not logged in. Please login.");
       } else {
-        alert(err.response?.data?.error || "Failed to reset password");
+        await showMessage(
+          err.response?.data?.error || "Failed to reset password"
+        );
       }
     }
   };

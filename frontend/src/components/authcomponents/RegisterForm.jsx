@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "../../api/axios";
 import styles from "./RegisterForm.module.css";
 import { useNavigate } from "react-router-dom";
+import { showMessage } from "../Message";
 
 export default function RegisterForm() {
   const [user, setUser] = useState({
@@ -10,7 +11,6 @@ export default function RegisterForm() {
     phonenumber: "",
     password: "",
   });
-  const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setloading] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
@@ -26,17 +26,16 @@ export default function RegisterForm() {
     try {
       const res = await axios.post("/auth/register", user);
       if (res.status === 201 || res.data.success) {
-        alert("Registeration successfull.");
-        setIsSuccess(true);
+        await showMessage("Registeration successfull.");
         navigate("/verify-otp", { state: { email: user.email } });
       } else {
-        alert(res.data?.error || "Failed to register. Try again.");
-        setIsSuccess(false);
+        await showMessage(res.data?.error || "Failed to register. Try again.");
       }
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || "Failed to register. Try again.");
-      setIsSuccess(false);
+      await showMessage(
+        err.response?.data?.error || "Failed to register. Try again."
+      );
     }
     setloading(false);
   };

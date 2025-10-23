@@ -3,13 +3,14 @@ import { Search } from "lucide-react";
 import styles from "./Navbar.module.css";
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
+import { showMessage } from "../Message";
 
 export default function Navbar() {
   const [query, setquery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
     axios
@@ -19,8 +20,8 @@ export default function Navbar() {
           setIsAuthed(true);
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(async (err) => {
+        console.log(err.message);
         setIsAuthed(false);
       });
   }, [navigate]);
@@ -41,7 +42,7 @@ export default function Navbar() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!query.trim()) return;
 
     const lowerQurey = query.toLowerCase();
@@ -83,7 +84,7 @@ export default function Navbar() {
       navigate(`${path}?search=${encodeURIComponent(query)}`);
       setquery("");
     } else {
-      alert("Please login.");
+      await showMessage("User not logged in. Please login");
       navigate("/login");
     }
   };
@@ -96,12 +97,22 @@ export default function Navbar() {
     try {
       const response = await axios.post("/auth/logout");
       if (response.status === 200 || response.data?.success) {
+        await showMessage(response.data?.message || "Logged out successfully.");
         setIsAuthed(false);
         navigate("/login");
       }
     } catch (err) {
       console.error(err.response?.data.message || err.message);
-      alert("An error occurred while logging out.");
+      await showMessage("An error occurred while logging out.");
+    }
+  };
+
+  const handleNavigate = async (route) => {
+    if (isAuthed) {
+      navigate(`/${route}`);
+    } else {
+      await showMessage("User not logged in. Please login");
+      navigate("/login");
     }
   };
 
@@ -146,30 +157,10 @@ export default function Navbar() {
           }`}
         >
           <li onClick={() => navigate("/")}>Home</li>
-          <li
-            onClick={() => (isAuthed ? navigate("/musics") : navigate("login"))}
-          >
-            Musics
-          </li>
-          <li
-            onClick={() => (isAuthed ? navigate("/videos") : navigate("login"))}
-          >
-            Videos
-          </li>
-          <li
-            onClick={() =>
-              isAuthed ? navigate("/exercise") : navigate("login")
-            }
-          >
-            Exercise
-          </li>
-          <li
-            onClick={() =>
-              isAuthed ? navigate("/contact") : navigate("login")
-            }
-          >
-            Contact
-          </li>
+          <li onClick={() => handleNavigate("musics")}>Musics</li>
+          <li onClick={() => handleNavigate("videos")}>Videos</li>
+          <li onClick={() => handleNavigate("exercise")}>Exercise</li>
+          <li onClick={() => handleNavigate("contact")}>Contact</li>
         </ul>
 
         {!isAuthed ? (
@@ -230,7 +221,7 @@ export default function Navbar() {
           </li>
           <li
             onClick={() => {
-              navigate("/musics");
+              handleNavigate("musics");
               setMobileMenuOpen(false);
             }}
           >
@@ -238,7 +229,7 @@ export default function Navbar() {
           </li>
           <li
             onClick={() => {
-              navigate("/videos");
+              handleNavigate("videos");
               setMobileMenuOpen(false);
             }}
           >
@@ -246,7 +237,7 @@ export default function Navbar() {
           </li>
           <li
             onClick={() => {
-              navigate("/exercise");
+              handleNavigate("exercise");
               setMobileMenuOpen(false);
             }}
           >
@@ -254,7 +245,7 @@ export default function Navbar() {
           </li>
           <li
             onClick={() => {
-              navigate("/contact");
+              handleNavigate("contact");
               setMobileMenuOpen(false);
             }}
           >

@@ -1,5 +1,6 @@
 import axios from "../../api/axios";
 import styles from "./VerifyOtp.module.css";
+import { showMessage } from "../Message";
 
 export default function ResendOtp({ timer, email, setTimer, setIsCounting }) {
   const handleResendOpt = async () => {
@@ -8,18 +9,18 @@ export default function ResendOtp({ timer, email, setTimer, setIsCounting }) {
         const res = await axios.post("/auth/resend-otp", { email: email });
 
         if (res.data?.success) {
-          alert(res.data.message || "OTP resent successfully!");
+          await showMessage(res.data.message || "OTP resent successfully!");
           setTimer(60);
           setIsCounting(true);
         } else {
-          alert(res.data?.message || "Failed to resend OTP.");
+          await showMessage(res.data?.message || "Failed to resend OTP.");
         }
       } else {
-        alert(`Resend OTP available in ${timer}s`);
+        await showMessage(`Resend OTP available in ${timer}s`);
       }
     } catch (err) {
-      console.error("Resend OTP error:", err.response || err.message);
-      alert(
+      // console.error("Resend OTP error:", err.response || err.message);
+      await showMessage(
         err.response?.data?.message ||
           "Error resending OTP. Please try again later."
       );

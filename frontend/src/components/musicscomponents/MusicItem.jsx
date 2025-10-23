@@ -7,7 +7,7 @@ export default function MusicItem({ song, onPlaySong, isActive }) {
       const res = await axios.get(`/musics/stream/${song.id}`);
       if (res.data.success) onPlaySong(res.data.data);
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
     }
   };
 

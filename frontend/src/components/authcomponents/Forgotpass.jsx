@@ -2,6 +2,7 @@ import axios from "../../api/axios";
 import { useState } from "react";
 import styles from "./Forgotpass.module.css";
 import { useNavigate } from "react-router-dom";
+import { showMessage } from "../Message";
 
 export default function Forgotpass() {
   const [User, setUser] = useState({ email: "", newpassword: "", confirm: "" });
@@ -14,13 +15,13 @@ export default function Forgotpass() {
     try {
       const res = await axios.post("/auth/forgot-password", User);
       if (res.status === 200 || res.data?.success) {
-        alert(res.data?.message || "Password has been reset successfully.");
+        await showMessage(
+          res.data?.message || "Password has been reset successfully."
+        );
         navigate("/login");
       }
     } catch (err) {
-      console.log(err.response?.data);
-      alert(err.response?.data?.error || err.message);
-      // setUser({ newpassword: "", confirm: "" });
+      await showMessage(err.response?.data?.error || err.message);
     }
   };
 

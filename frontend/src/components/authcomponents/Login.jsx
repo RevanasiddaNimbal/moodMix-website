@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "../../api/axios";
 import styles from "./Login.module.css";
 import { useNavigate } from "react-router-dom";
+import { showMessage } from "../Message";
 
 export default function Login() {
   const [user, setuser] = useState({ email: "", password: "" });
@@ -15,7 +16,7 @@ export default function Login() {
     try {
       const response = await axios.post("/auth/login", user);
 
-      alert(response.data?.message || "Login successfull");
+      await showMessage(response.data?.message || "Login successfull");
       setuser({ email: "", password: "" });
 
       navigate("/");
@@ -23,14 +24,14 @@ export default function Login() {
       const data = err.response?.data;
 
       if (data?.redirect) {
-        alert(data.message || "Please verify your account.");
+        await showMessage(data.message || "Please verify your account.");
         navigate("/verify-otp", { state: { email: data.user.email } });
         setuser({ email: "", password: "" });
         setloading(false);
         return;
       }
 
-      alert(data?.error || "Login failed. Try again.");
+      await showMessage(data?.error || "Login failed. Try again.");
       setloading(false);
     }
   };

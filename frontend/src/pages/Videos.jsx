@@ -3,12 +3,11 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
 import VideosList from "../components/videocomponents/videosList";
-import LoadingComponent from "../components/LoadingComponent";
+import LoadingComponent from "../components/Loading";
 
 export default function Video() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const location = useLocation();
 
   const searchParam = new URLSearchParams(location.search);

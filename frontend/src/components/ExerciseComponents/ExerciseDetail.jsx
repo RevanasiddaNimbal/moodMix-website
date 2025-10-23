@@ -1,4 +1,3 @@
-import { loadAgeGenderModel } from "face-api.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ExerciseDetail.module.css";
 import { useEffect, useState } from "react";

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./Herosection.module.css";
 import axios from "../../api/axios";
 import { useNavigate } from "react-router-dom";
+import { showMessage } from "../Message";
 
 export default function HeroSection() {
   const navigate = useNavigate();
@@ -20,11 +21,11 @@ export default function HeroSection() {
       });
   }, []);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (isAuthed) {
       navigate("/capture-face");
     } else {
-      alert("User not loged in. Please login.");
+      await showMessage("User not logged in. Please login");
       navigate("/login");
     }
   };

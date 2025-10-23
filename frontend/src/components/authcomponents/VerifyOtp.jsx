@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Timer from "./Timer";
 import ResendOtp from "./ResendOtp";
 import styles from "./verifyOtp.module.css";
+import { showMessage } from "../Message";
 
 export default function VerifyOtp() {
   const location = useLocation();
@@ -24,7 +25,7 @@ export default function VerifyOtp() {
 
   const handleVerifyOtp = async () => {
     if (!otp) {
-      alert("Please enter OTP.");
+      await showMessage("Please enter OTP.");
       return;
     }
 
@@ -35,15 +36,15 @@ export default function VerifyOtp() {
       });
 
       if (res.data?.success) {
-        alert(res.data.message || "OTP verified successfully!");
+        await showMessage(res.data.message || "OTP verified successfully!");
         navigate("/login");
       } else {
-        alert(res.data?.error || "Invalid OTP, please try again.");
+        await showMessage(res.data?.error || "Invalid OTP, please try again.");
         setOtp("");
       }
     } catch (err) {
       console.error("OTP verify error:", err.response || err.message);
-      alert(
+      await showMessage(
         err.response?.data?.error ||
           "Error verifying OTP. Please try again later."
       );

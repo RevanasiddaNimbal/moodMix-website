@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import musicAPI from "../../api/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ExerciseList.module.css";
-import LoadingComponent from "../LoadingComponent";
+import LoadingComponent from "../Loading";
 
 export default function ExerciseList() {
   const [exercises, setExercises] = useState([]);
@@ -23,7 +23,7 @@ export default function ExerciseList() {
         });
         setExercises(res.data || []);
       } catch (err) {
-        console.error("Error fetching exercises:", err);
+        console.error("Error fetching exercises:", err.message);
         setExercises([]);
       } finally {
         setLoading(false);
@@ -44,7 +44,7 @@ export default function ExerciseList() {
           const url = URL.createObjectURL(res.data);
           newImages[exercise.id] = url;
         } catch (err) {
-          console.error("Error loading image:", err);
+          console.error("Error loading image:", err.message);
           newImages[exercise.id] =
             "https://placehold.co/600x400?text=No+Image+Available";
         }

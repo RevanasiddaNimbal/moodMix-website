@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import MusicItem from "./MusicItem";
 import styles from "./MusicList.module.css";
-import LoadingComponent from "../LoadingComponent";
+import LoadingComponent from "../Loading";
 
 export default function MusicList({ query, mood, onPlaySong, currentSong }) {
   const [songs, setSongs] = useState([]);
