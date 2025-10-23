@@ -4,18 +4,6 @@ export default function Contact() {
   const navigate = useNavigate();
   return (
     <div className={styles.page}>
-      <div
-        className={styles.logoSection}
-        onClick={() => navigate("/")}
-        role="button"
-      >
-        <img
-          src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/music-logo-design-template-b615c48e5016a72b335fc16252cd4993_screen.jpg?ts=1691430592"
-          alt="mood Mix"
-          className={styles.logo}
-        />
-        <span className={styles.brand}>MoodMix</span>
-      </div>
       <div className={styles.content}>
         <h1>Contact Us</h1>
 

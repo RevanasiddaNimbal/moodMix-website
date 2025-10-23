@@ -170,13 +170,19 @@ exports.login = async (req, res, next) => {
         error: result.error,
       });
     }
-    const token = await jwt.sign(
+    const token = jwt.sign(
       {
         id: result.user?.id || result.id,
         email: email,
       },
       process.env.SECRET_KEY,
       { expiresIn: "2h" }
+    );
+
+    const refreshToken = jwt.sign(
+      { email: result.user.email },
+      process.env.REFRESH_KEY,
+      { expiresIn: "7d" }
     );
 
     res.cookie("token", token, {
@@ -186,12 +192,18 @@ exports.login = async (req, res, next) => {
       maxAge: 2 * 60 * 60 * 1000,
     });
 
+    res.cookie("refreshtoken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(200).json({
       success: true,
       message: "login successful.",
       email: result.email,
       name: result.name,
-      token: token,
     });
   } catch (err) {
     console.log("login error: ", err.stack);
@@ -278,6 +290,12 @@ exports.logout = async (req, res, next) => {
       sameSite: "none",
     });
 
+    res.clearCookie("refreshtoken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+
     res.status(200).json({
       success: true,
       message: "logged out successfully",
@@ -298,6 +316,50 @@ exports.verify = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const refreshtoken = req.cookies?.refreshtoken;
+    if (!refreshtoken) {
+      return res.status(400).json({
+        success: false,
+        error: "Refresh token is required.",
+      });
+    }
+
+    const decode = jwt.verify(refreshtoken, process.env.REFRESH_KEY);
+    if (!decode) {
+      return res.status(401).json({
+        success: false,
+        error: "invalid or expired token.",
+      });
+    }
+    const newToken = jwt.sign(
+      {
+        email: decode.email,
+      },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "2m",
+      }
+    );
+
+    res.cookie("token", newToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 2 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Access token refreshed successfully.",
+    });
+  } catch (err) {
+    console.log("Refresh Error:", err.stack);
+    next(err);
   }
 };
 

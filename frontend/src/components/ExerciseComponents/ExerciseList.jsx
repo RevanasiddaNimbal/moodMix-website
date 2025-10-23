@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import musicAPI from "../../api/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ExerciseList.module.css";
+import LoadingComponent from "../LoadingComponent";
 
 export default function ExerciseList() {
   const [exercises, setExercises] = useState([]);
@@ -54,7 +55,7 @@ export default function ExerciseList() {
     if (exercises.length > 0) fetchImages();
   }, [exercises]);
 
-  if (loading) return <p className={styles.loading}>Loading exercises...</p>;
+  if (loading) return <LoadingComponent />;
 
   if (!exercises.length)
     return <p className={styles.empty}>No exercises found.</p>;

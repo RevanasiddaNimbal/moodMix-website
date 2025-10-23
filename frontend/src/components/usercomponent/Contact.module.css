@@ -8,36 +8,9 @@
   padding: 1rem;
   margin: 0 auto;
   max-width: 900px;
-  background-color: rgba(255, 255, 255, 0.324);
-}
-.logoSection {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  margin-bottom: 20px;
-  margin-left: -150px;
-}
-.logoSection:hover {
-  transform: scale3d(1.03);
+  background: rgba(253, 251, 251, 0.086);
 }
 
-.logo {
-  height: 40px;
-  width: 40px;
-  border-radius: 12px;
-  object-fit: cover;
-  border: 2px solid #34d399;
-  margin-right: 4px;
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
-}
-
-.brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: #34d399;
-  text-shadow: 0 0 6px rgba(52, 211, 153, 0.355);
-}
 .content {
   flex: 1;
 }

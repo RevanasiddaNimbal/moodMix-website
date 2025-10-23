@@ -8,13 +8,8 @@ export default function HeroSection() {
   const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     axios
-      .get("/auth/verify", {
-        headers: { "x-verify-token": token },
-      })
+      .get("/auth/verify")
       .then((res) => {
         if (res.data.success) {
           setIsAuthed(true);
@@ -22,7 +17,6 @@ export default function HeroSection() {
       })
       .catch(() => {
         setIsAuthed(false);
-        localStorage.removeItem("token");
       });
   }, []);
 

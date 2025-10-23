@@ -1,15 +1,16 @@
 import videoAPI from "../api/axios";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
 import VideosList from "../components/videocomponents/videosList";
-import VideoPlayer from "../components/videocomponents/VideoPlayer";
+import LoadingComponent from "../components/LoadingComponent";
 
 export default function Video() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null);
+
   const location = useLocation();
+
   const searchParam = new URLSearchParams(location.search);
   const query = searchParam.get("search");
   const mood = location.state?.mood;
@@ -40,7 +41,7 @@ export default function Video() {
     fetchVideos();
   }, [query, mood]);
 
-  if (loading) return <p>loading...</p>;
+  if (loading) return <LoadingComponent />;
 
   return (
     <div>

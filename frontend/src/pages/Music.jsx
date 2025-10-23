@@ -5,7 +5,6 @@ import MusicPlayer from "../components/musicscomponents/MusicPlayer";
 
 export default function MusicPage() {
   const [currentSong, setCurrentSong] = useState(null);
-  const [songs, setSongs] = useState([]);
 
   const location = useLocation();
   const searchParam = new URLSearchParams(location.search);
@@ -22,18 +21,10 @@ export default function MusicPage() {
         query={query}
         mood={mood}
         onPlaySong={handlePlaySong}
-        currentSongId={currentSong?.id}
-        setSongs={setSongs}
+        currentSong={currentSong?.title}
       />
 
-      {currentSong && (
-        <MusicPlayer
-          currentSong={currentSong}
-          onClose={handleClosePlayer}
-          onNext={handleNext}
-          onPrev={handlePrev}
-        />
-      )}
+      {currentSong && <MusicPlayer currentSong={currentSong} />}
     </div>
   );
 }

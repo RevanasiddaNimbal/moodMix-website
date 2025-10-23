@@ -3,7 +3,7 @@
   grid-template-columns: 1fr;
   gap: 12px;
   padding: 16px;
-
+  padding-bottom: 100px;
   background: radial-gradient(circle at top, #2c3e50, #000000);
   color: #fff;
 }

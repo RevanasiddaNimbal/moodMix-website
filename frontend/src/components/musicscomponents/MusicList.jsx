@@ -2,14 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import MusicItem from "./MusicItem";
 import styles from "./MusicList.module.css";
+import LoadingComponent from "../LoadingComponent";
 
-export default function MusicList({
-  query,
-  mood,
-  onPlaySong,
-  currentSongId,
-  setSongs: setParentSongs,
-}) {
+export default function MusicList({ query, mood, onPlaySong, currentSong }) {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,23 +18,20 @@ export default function MusicList({
         });
         if (res.data.success) {
           setSongs(res.data.data);
-          if (setParentSongs) setParentSongs(res.data.data);
         } else {
           setSongs([]);
-          if (setParentSongs) setParentSongs([]);
         }
       } catch (err) {
         console.error(err);
         setSongs([]);
-        if (setParentSongs) setParentSongs([]);
       } finally {
         setLoading(false);
       }
     };
     fetchSongs();
-  }, [query, setParentSongs, mood]);
+  }, [query, mood]);
 
-  if (loading) return <div className={styles.loading}>loading songs...</div>;
+  if (loading) return <LoadingComponent />;
 
   if (songs.length === 0)
     return (
@@ -59,7 +51,7 @@ export default function MusicList({
           key={song.id}
           song={song}
           onPlaySong={onPlaySong}
-          isActive={currentSongId === song.id}
+          isActive={currentSong === song.title}
         />
       ))}
     </div>

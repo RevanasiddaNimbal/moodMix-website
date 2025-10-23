@@ -8,6 +8,11 @@
   transition: background-color 0.2s ease-in-out;
   overflow: hidden;
 }
+.active {
+  background-color: #f2f2f01e;
+  border-left: 4px solid rgb(0, 255, 102);
+  padding-left: 8px;
+}
 
 .item:hover {
   background-color: #f8f8f85b;
@@ -16,11 +21,6 @@
 
 .item.active {
   background-color: #3a3a3a;
-}
-.active {
-  background-color: #29292892;
-  border-left: 4px solid red;
-  padding-left: 8px;
 }
 
 .cover {

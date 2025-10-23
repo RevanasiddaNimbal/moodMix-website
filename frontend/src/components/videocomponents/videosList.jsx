@@ -37,12 +37,16 @@ export default function VideosList({ videos }) {
 
               <div className={styles.videoInfo}>
                 <h3 className={styles.title}>{video.snippet?.title}</h3>
-                <p className={styles.channel}>{video.snippet?.channelTitle}</p>
-                <p className={styles.date}>
-                  {video.snippet?.publishedAt
-                    ? new Date(video.snippet.publishedAt).toLocaleDateString()
-                    : ""}
-                </p>
+                <div className={styles.meta}>
+                  <p className={styles.channel}>
+                    {video.snippet?.channelTitle}
+                  </p>
+                  <p className={styles.date}>
+                    {video.snippet?.publishedAt
+                      ? new Date(video.snippet.publishedAt).toLocaleDateString()
+                      : ""}
+                  </p>
+                </div>
               </div>
             </div>
           ))}

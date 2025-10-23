@@ -1,10 +1,11 @@
 import styles from "./VideoPlayer.module.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import YouTube from "react-youtube";
 
 export default function VideoPlayer() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   let initSelected = location.state?.selected;
   const videos = location.state?.videos;
@@ -48,19 +49,24 @@ export default function VideoPlayer() {
         {/* Video info */}
         <div className={styles.info}>
           <h3>{snippet?.title}</h3>
-          <p>{snippet?.description}</p>
-          <p>
-            <strong>Channel:</strong> {snippet?.channelTitle}
-          </p>
-          <p>
-            <strong>Published:</strong>{" "}
-            {new Date(snippet?.publishedAt).toLocaleDateString()}
-          </p>
+          <p className={styles.description}>{snippet?.description}</p>
+          <div className={styles.meta}>
+            <p>
+              <strong>Channel:</strong> {snippet?.channelTitle}
+            </p>
+            <p>
+              <strong>Published:</strong>{" "}
+              {new Date(snippet?.publishedAt).toLocaleDateString()}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Right side - next videos */}
       <div className={styles.nextVideos}>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+          ← Back
+        </button>
         <h4>Next Videos</h4>
         {nextVideos?.length === 0 ? (
           <p>No other videos found.</p>

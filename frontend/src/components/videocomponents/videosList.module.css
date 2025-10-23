@@ -17,16 +17,17 @@
 .videoGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  gap: 30px;
   justify-content: center;
   transition: all 0.3s ease;
 }
 
 .videoCard {
-  background: rgb(243, 241, 231);
+  background: rgba(243, 241, 231, 0);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   overflow: hidden;
+  color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -68,24 +69,33 @@
 }
 
 .videoInfo {
-  padding: 12px 14px;
+  padding: 0px 14px;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-
+.videoInfo p {
+  margin: 4px 0;
+  display: flex;
+  gap: 1px;
+  align-items: center;
+}
 .title {
   font-size: 16px;
   font-weight: 600;
-  color: #111;
+  color: #faf9f9dc;
   margin: 6px 0;
   line-height: 1.4;
 }
 
 .channel {
   font-size: 14px;
-  color: #555;
+  color: #a7a4a4d0;
+}
+.meta {
+  display: flex;
+  gap: 10px;
 }
 
 .date {

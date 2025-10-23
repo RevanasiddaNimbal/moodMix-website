@@ -28,7 +28,6 @@ function AppWrapper() {
     "/register",
     "/reset-password",
     "/forgot-password",
-    "/contact",
     "/verify-otp",
   ];
 

@@ -16,7 +16,6 @@ export default function Login() {
       const response = await axios.post("/auth/login", user);
 
       alert(response.data?.message || "Login successfull");
-      localStorage.setItem("token", response.data.token);
       setuser({ email: "", password: "" });
 
       navigate("/");

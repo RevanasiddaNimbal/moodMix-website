@@ -12,16 +12,8 @@ export default function Navbar() {
   const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setIsAuthed(false);
-      return;
-    }
-
     axios
-      .get("/auth/verify", {
-        headers: { "x-verify-token": token },
-      })
+      .get("/auth/verify")
       .then((res) => {
         if (res.data.success) {
           setIsAuthed(true);
@@ -30,7 +22,6 @@ export default function Navbar() {
       .catch((err) => {
         console.log(err);
         setIsAuthed(false);
-        localStorage.removeItem("token");
       });
   }, [navigate]);
 
@@ -105,7 +96,6 @@ export default function Navbar() {
     try {
       const response = await axios.post("/auth/logout");
       if (response.status === 200 || response.data?.success) {
-        localStorage.removeItem("token");
         setIsAuthed(false);
         navigate("/login");
       }
