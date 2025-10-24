@@ -1,0 +1,33 @@
+// Create table for exercises.
+CREATE TABLE exercises (
+  id SERIAL PRIMARY KEY,
+  external_id VARCHAR(128) UNIQUE,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  body_part VARCHAR(100),
+  target VARCHAR(100) NOT NULL,
+  equipment VARCHAR(100),
+  gif_url TEXT,
+  image_url TEXT,
+  instructions TEXT[],
+  category VARCHAR(100),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+// create table for search_history.
+CREATE TABLE search_history (
+  id          SERIAL PRIMARY KEY,
+  query_text  VARCHAR(255),
+  mood        VARCHAR(50),
+  hits        INTEGER DEFAULT 1,
+  last_hit_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT uq_query_mood UNIQUE (query_text, mood)
+);
+
+//create index for searching fastly
+CREATE INDEX idx_name_lower ON exercises (LOWER(name));
+CREATE INDEX idx_target_lower ON exercises (LOWER(target));
+CREATE INDEX idx_query ON search_history (query_text);
+CREATE INDEX idx_mood ON search_history (mood);
+
+

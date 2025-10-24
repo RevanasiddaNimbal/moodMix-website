@@ -1,26 +1,18 @@
 const { exerciseAPI } = require("../utils/api");
+const Exercise = require("../model/exercise");
+const supabase = require("../config/storage");
+
 const moodMap = {
-  happy: ["calves", "glutes", "cardiovascular system"], // energetic/lower-body
-  sad: ["abs", "spine", "upper back"], // core + posture improving
-  calm: ["serratus anterior", "forearms", "levator scapulae"], // relaxing/stretch-based targets
-  angry: ["pectorals", "delts", "triceps"], // push exercises, anger outlet
-  excited: ["quads", "hamstrings", "lats"], // full-body dynamic targets
+  happy: ["calves", "shoulders", "cable"],
+  sad: ["abs", "lower legs", "barbell"],
+  calm: ["serratus anterior", "chest", "shoulders"],
+  angry: ["delts", "triceps"],
+  excited: ["quads", "pectorals", "lats"],
 };
-const cache = {};
-function setCache(endpoint, data) {
-  cache[endpoint] = data;
-  setTimeout(() => delete cache[endpoint], 600000);
-}
 
 async function fetchExercises(endpoint) {
-  if (cache[endpoint]) {
-    console.log("Using cached data for:", endpoint);
-    return cache[endpoint];
-  }
-
   try {
     const response = await exerciseAPI.get(`/exercises${endpoint}`);
-    setCache(endpoint, response.data);
     console.log("request sent : ", endpoint);
     return response.data;
   } catch (err) {
@@ -31,51 +23,73 @@ async function fetchExercises(endpoint) {
 
 exports.getExercises = async (req, res) => {
   try {
-    const { q, mood } = req.query;
+    const query = Exercise.normalize(req.query.q);
+    const moodValue = Exercise.normalize(req.query.mood);
     let exercises = [];
-    const query = q?.trim().toLowerCase() || "";
-    const moodValue = mood?.trim().toLowerCase() || "";
 
-    if (query && /^[a-zA-Z\s]+$/.test(query)) {
-      let byName = await fetchExercises(`/name/${query}`);
+    await Exercise.updateHistory(query, moodValue);
 
-      exercises = [...byName];
+    exercises = query ? await Exercise.searchBykeywords(query) : [];
 
-      let uniqueTracks = {};
-      exercises.forEach((track) => {
-        uniqueTracks[track.id] = track;
-      });
-
-      exercises = Object.values(uniqueTracks);
-    } else if (moodMap[moodValue]) {
+    if (!query && moodValue) {
       const categories = moodMap[moodValue] || moodMap["happy"];
       let moodExercises = [];
 
-      for (const cat of categories.slice(0, 2)) {
-        const data = await fetchExercises(`/target/${encodeURIComponent(cat)}`);
+      for (const cat of categories) {
+        const data = await Exercise.searchBykeywords(Exercise.normalize(cat));
         if (data && data.length > 0) {
           moodExercises = moodExercises.concat(data);
-          break;
         }
       }
 
-      exercises = moodExercises;
-    } else {
+      exercises = [...moodExercises];
+    }
+
+    if (!query && !moodValue) {
       const categories = moodMap["happy"];
       let moodExercises = [];
 
-      for (const cat of categories.slice(0, 2)) {
-        const data = await fetchExercises(`/target/${encodeURIComponent(cat)}`);
+      for (const cat of categories) {
+        const data = await Exercise.searchBykeywords(Exercise.normalize(cat));
         if (data && data.length > 0) {
           moodExercises = moodExercises.concat(data);
-          break;
         }
       }
-
-      exercises = moodExercises;
+      exercises = [...moodExercises];
     }
 
-    if (exercises.length === 0) {
+    if (!exercises || exercises.length === 0) {
+      if (query) {
+        const result = await fetchExercises(`/name/${query}`);
+        console.log("Fetched exercises for query:", result);
+        if (result && result.length > 0) {
+          const exerciseData = await Exercise.storeExercises(result);
+
+          exercises = [...exerciseData];
+        } else {
+          const exerciseData = await Exercise.searchBykeywords("calves");
+          exercises = [...exerciseData];
+        }
+      } else {
+        const categories = moodMap[moodValue]
+          ? moodMap[moodValue]
+          : moodMap["happy"];
+        let exerciseData = [];
+
+        for (const cat of categories.slice(0, 2)) {
+          const result = await fetchExercises(
+            `/target/${encodeURIComponent(cat)}`
+          );
+          if (result && result.length > 0) {
+            exerciseData = await Exercise.storeExercises(result);
+            exerciseData = [...exerciseData];
+          }
+        }
+        exercises = [...exerciseData];
+      }
+    }
+
+    if (!exercises || exercises.length === 0) {
       return res.status(400).json({
         success: false,
         error: "Data not found",
@@ -102,16 +116,47 @@ exports.getImage = async (req, res) => {
   }
 
   try {
-    const imageUrl = `/image?exerciseId=${id}&resolution=360`;
+    const result = await Exercise.getGifUrl(id);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        error: "Exercise not found.",
+      });
+    }
+    let publicUrl = null;
+    if (result.gif_url) {
+      publicUrl = result.gif_url;
+      return res.status(200).json({ success: true, url: publicUrl });
+    }
 
+    const external_id = result?.external_id;
+    const imageUrl = `/image?exerciseId=${external_id}&resolution=360`;
     const imageResponse = await exerciseAPI.get(imageUrl, {
-      responseType: "stream",
+      responseType: "arraybuffer",
     });
 
-    res.set("Content-Type", "image/gif");
-    res.set("Cache-Control", "public, max-age=3600");
+    const fileBuffer = Buffer.from(imageResponse.data);
+    const fileName = `exercise_${id}-${Date.now()}.gif`;
 
-    imageResponse.data.pipe(res);
+    const { data, error } = await supabase.storage
+      .from("moodMix")
+      .upload(fileName, fileBuffer, {
+        contentType: "image/gif",
+      });
+
+    if (error) {
+      console.log("Supabase upload error:", error.message);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to upload image.",
+      });
+    }
+    const { data: urlData } = supabase.storage
+      .from("moodMix")
+      .getPublicUrl(fileName);
+
+    publicUrl = await Exercise.updateGifUrl(id, urlData.publicUrl);
+    res.status(200).json({ success: true, url: publicUrl });
   } catch (error) {
     console.error("Error in image proxy:", error.message);
     res.status(500).send("Failed to fetch image.");

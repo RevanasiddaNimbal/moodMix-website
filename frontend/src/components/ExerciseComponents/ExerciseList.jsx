@@ -35,20 +35,25 @@ export default function ExerciseList() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const newImages = {};
-      for (const exercise of exercises) {
+      const promises = exercises.map(async (exercise) => {
         try {
-          const res = await musicAPI.get(`/exercise-image?id=${exercise.id}`, {
-            responseType: "blob",
-          });
-          const url = URL.createObjectURL(res.data);
-          newImages[exercise.id] = url;
+          const res = await musicAPI.get(`/exercise-image?id=${exercise.id}`);
+          return { id: exercise.id, url: res.data.url };
         } catch (err) {
           console.error("Error loading image:", err.message);
-          newImages[exercise.id] =
-            "https://placehold.co/600x400?text=No+Image+Available";
+          return {
+            id: exercise.id,
+            url: "https://placehold.co/600x400?text=No+Image+Available",
+          };
         }
-      }
+      });
+
+      const results = await Promise.all(promises);
+      const newImages = {};
+      results.forEach((item) => {
+        newImages[item.id] = item.url;
+      });
+
       setImages(newImages);
     };
 
