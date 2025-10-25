@@ -97,9 +97,9 @@ export default function Navbar() {
     try {
       const response = await axios.post("/auth/logout");
       if (response.status === 200 || response.data?.success) {
-        await showMessage(response.data?.message || "Logged out successfully.");
         setIsAuthed(false);
         navigate("/login");
+        await showMessage(response.data?.message || "Logged out successfully.");
       }
     } catch (err) {
       console.error(err.response?.data.message || err.message);

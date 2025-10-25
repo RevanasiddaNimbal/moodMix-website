@@ -15,11 +15,9 @@ export default function Login() {
     setloading(true);
     try {
       const response = await axios.post("/auth/login", user);
-
+      navigate("/");
       await showMessage(response.data?.message || "Login successfull");
       setuser({ email: "", password: "" });
-
-      navigate("/");
     } catch (err) {
       const data = err.response?.data;
 

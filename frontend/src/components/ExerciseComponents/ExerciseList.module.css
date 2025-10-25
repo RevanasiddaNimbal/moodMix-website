@@ -21,6 +21,7 @@
   color: var(--text);
   padding: 2rem;
   text-align: center;
+  opacity: 0.4;
 }
 
 .pageHeader {
@@ -43,6 +44,8 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
 }
 
 @media (min-width: 520px) {

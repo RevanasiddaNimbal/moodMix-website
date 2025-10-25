@@ -10,7 +10,7 @@ const moodMap = {
   excited: ["quads", "pectorals", "lats"],
 };
 
-async function fetchExercises(endpoint) {
+const fetchExercises = async (endpoint) => {
   try {
     const response = await exerciseAPI.get(`/exercises${endpoint}`);
     console.log("request sent : ", endpoint);
@@ -19,17 +19,21 @@ async function fetchExercises(endpoint) {
     console.error("Error fetching exercises:", err.message);
     return [];
   }
-}
+};
 
 exports.getExercises = async (req, res) => {
   try {
     const query = Exercise.normalize(req.query.q);
     const moodValue = Exercise.normalize(req.query.mood);
+
     let exercises = [];
 
     await Exercise.updateHistory(query, moodValue);
 
     exercises = query ? await Exercise.searchBykeywords(query) : [];
+    if (exercises.length !== 0) {
+      exercises = await Exercise.sortExercises(exercises);
+    }
 
     if (!query && moodValue) {
       const categories = moodMap[moodValue] || moodMap["happy"];
@@ -61,15 +65,10 @@ exports.getExercises = async (req, res) => {
     if (!exercises || exercises.length === 0) {
       if (query) {
         const result = await fetchExercises(`/name/${query}`);
-        console.log("Fetched exercises for query:", result);
-        if (result && result.length > 0) {
-          const exerciseData = await Exercise.storeExercises(result);
+        const exerciseData = await Exercise.storeExercises(result);
+        const sortedExercises = await Exercise.sortExercises(exerciseData);
 
-          exercises = [...exerciseData];
-        } else {
-          const exerciseData = await Exercise.searchBykeywords("calves");
-          exercises = [...exerciseData];
-        }
+        exercises = [...sortedExercises];
       } else {
         const categories = moodMap[moodValue]
           ? moodMap[moodValue]
@@ -80,9 +79,12 @@ exports.getExercises = async (req, res) => {
           const result = await fetchExercises(
             `/target/${encodeURIComponent(cat)}`
           );
+
           if (result && result.length > 0) {
             exerciseData = await Exercise.storeExercises(result);
-            exerciseData = [...exerciseData];
+            const sortedData = await Exercise.sortExercises(exerciseData);
+
+            exerciseData = [...exerciseData, ...sortedData];
           }
         }
         exercises = [...exerciseData];

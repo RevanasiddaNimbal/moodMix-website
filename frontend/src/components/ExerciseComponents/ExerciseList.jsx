@@ -17,6 +17,7 @@ export default function ExerciseList() {
 
   useEffect(() => {
     const fetchExercises = async () => {
+      setLoading(true);
       try {
         const res = await musicAPI.get(`/exercises`, {
           params: { q: query, mood },
@@ -43,7 +44,7 @@ export default function ExerciseList() {
           console.error("Error loading image:", err.message);
           return {
             id: exercise.id,
-            url: "https://placehold.co/600x400?text=No+Image+Available",
+            url: "https://placehold.co/1000x900?text=No+Image+Available",
           };
         }
       });

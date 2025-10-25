@@ -15,7 +15,6 @@ const exercises = {
         "INSERT INTO search_history(query_text , mood, hits,last_hit_at) VALUES ($1,$2, 1,NOW()) ON CONFLICT (query_text,mood) DO UPDATE SET hits = search_history.hits + 1, last_hit_at = NOW() RETURNING *",
         [query, moodValue]
       );
-      console.log("History updated:", result.rows[0]);
       return result.rows[0];
     } catch (err) {
       console.log("Error updating history:", err.message);
@@ -24,6 +23,7 @@ const exercises = {
       };
     }
   },
+
   storeExercises: async (exercisesArray = []) => {
     if (!exercisesArray || exercisesArray.length === 0) return [];
     const storedExercises = [];
@@ -64,39 +64,10 @@ const exercises = {
         if (result.rows.length > 0) {
           storedExercises.push(result.rows[0]);
         }
+        return storedExercises;
       } catch (err) {
         console.log("Error storing exercise:", err.message);
       }
-    }
-
-    try {
-      const result = await pool.query(
-        `SELECT 
-          e.*, 
-          COALESCE(sh.hits, 0) AS search_hits
-        FROM exercises e
-        LEFT JOIN search_history sh
-          ON LOWER(e.name) LIKE '%' || LOWER(sh.query_text) || '%'
-        ORDER BY sh.hits DESC, e.updated_at DESC
-        LIMIT 100;
-      `
-      );
-      let allResults = [...result.rows, ...storedExercises];
-      console.log("data: ", allResults.length);
-      if (allResults.length === 0) {
-        const fallback = await pool.query(
-          `SELECT * FROM exercises ORDER BY updated_at DESC LIMIT 100;`
-        );
-        allResults = fallback.rows;
-      }
-      const uniqueExercises = {};
-      for (const exercise of allResults) {
-        uniqueExercises[exercise.id] = exercise;
-      }
-      return Object.values(uniqueExercises);
-    } catch (err) {
-      console.log("Error fetching updated exercises:", err.message);
-      return storedExercises;
     }
   },
 
@@ -165,14 +136,66 @@ const exercises = {
       };
     }
   },
+
+  sortExercises: async (exercises = []) => {
+    try {
+      const historyRes = await pool.query(
+        `SELECT query_text, mood, hits 
+       FROM search_history 
+       ORDER BY hits DESC, last_hit_at DESC 
+       LIMIT 20;`
+      );
+
+      const historyQueries = historyRes.rows.map((r) => r.query_text);
+
+      let his_exercises = [];
+      for (const query of historyQueries) {
+        const result = await pool.query(
+          `SELECT e.*, COALESCE(sh.hits, 0) AS search_hits
+       FROM exercises e
+       LEFT JOIN search_history sh
+         ON LOWER(e.name) LIKE '%' || LOWER(sh.query_text) || '%'
+       WHERE LOWER(e.name) LIKE '%' || LOWER($1) || '%'
+       ORDER BY sh.hits DESC, e.updated_at DESC
+       LIMIT 50`,
+          [query]
+        );
+        if (result.rows.length > 0) {
+          his_exercises.push(...result.rows);
+        }
+      }
+
+      let allResults = [...his_exercises, ...exercises];
+
+      if (allResults.length === 0) {
+        const fallback = await pool.query(
+          `SELECT * FROM exercises ORDER BY updated_at DESC LIMIT 100;`
+        );
+        allResults = fallback.rows;
+      }
+      const uniqueExercises = {};
+      for (const exercise of allResults) {
+        uniqueExercises[exercise.id] = exercise;
+      }
+
+      return Object.values(uniqueExercises);
+    } catch (err) {
+      console.log("Error fetching updated exercises:", err.message);
+      return exercises || [];
+    }
+  },
+
   updateGifUrl: async (Id, gifUrl) => {
     try {
       if (!Id || !gifUrl) return null;
+
       const result = await pool.query(
         `UPDATE exercises SET gif_url = $1 WHERE id = $2 RETURNING *`,
         [gifUrl, Id]
       );
+
       if (result.rows.length === 0) return false;
+
       return result.rows[0].gif_url;
     } catch (err) {
       console.log("Error updating gif url:", err.message);
@@ -182,11 +205,14 @@ const exercises = {
   getGifUrl: async (exerciseId) => {
     try {
       if (!exerciseId) return null;
+
       const result = await pool.query(
         `SELECT gif_url, external_id FROM exercises WHERE id = $1`,
         [exerciseId]
       );
+
       if (result.rows.length === 0) return null;
+
       return result.rows[0];
     } catch (err) {
       console.log("Error fetching gif url:", err.message);
