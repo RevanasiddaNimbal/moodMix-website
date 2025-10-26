@@ -12,13 +12,12 @@ export default function VideoPlayer() {
 
   const [selected, setSelected] = useState(initSelected);
 
-  const snippet = selected.snippet || {};
-  const videoId = selected?.id?.videoId;
+  const videoId = selected?.video_id;
   if (!selected || !videoId || !videos) {
     return <p className={styles.noVideo}>Select a video to play</p>;
   }
 
-  const nextVideos = videos?.filter((v) => v?.id?.videoId);
+  const nextVideos = videos?.filter((v) => v?.id);
   const handleClick = (video) => {
     setSelected(video);
   };
@@ -46,23 +45,21 @@ export default function VideoPlayer() {
           />
         </div>
 
-        {/* Video info */}
         <div className={styles.info}>
-          <h3>{snippet?.title}</h3>
-          <p className={styles.description}>{snippet?.description}</p>
+          <h3>{selected?.title}</h3>
+          <p className={styles.description}>{selected?.description}</p>
           <div className={styles.meta}>
             <p>
-              <strong>Channel:</strong> {snippet?.channelTitle}
+              <strong>Channel:</strong> {selected?.channel_title}
             </p>
             <p>
               <strong>Published:</strong>{" "}
-              {new Date(snippet?.publishedAt).toLocaleDateString()}
+              {new Date(selected?.published_at).toLocaleDateString()}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Right side - next videos */}
       <div className={styles.nextVideos}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>
           ← Back
@@ -73,17 +70,17 @@ export default function VideoPlayer() {
         ) : (
           nextVideos?.map((video) => (
             <div
-              key={video.id.videoId}
+              key={video.id}
               className={`${styles.videoItem} ${
-                video.id.videoId === videoId ? styles.selected : ""
+                video.video_id === videoId ? styles.selected : ""
               }`}
               onClick={() => handleClick(video)}
             >
               <img
-                src={video.snippet.thumbnails.default.url}
-                alt={video.snippet.title}
+                src={video.thumbnail_medium || video.thumbnail_default}
+                alt={video.title}
               />
-              <p>{video.snippet.title}</p>
+              <p>{video.title}</p>
             </div>
           ))
         )}

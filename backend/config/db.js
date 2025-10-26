@@ -1,6 +1,5 @@
 const { Pool } = require("pg");
 
-//database confug()
 const pool = new Pool({
   connectionString: process.env.DB_URL,
   max: 10,

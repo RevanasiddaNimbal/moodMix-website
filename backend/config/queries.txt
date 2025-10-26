@@ -30,4 +30,30 @@ CREATE INDEX idx_target_lower ON exercises (LOWER(target));
 CREATE INDEX idx_query ON search_history (query_text);
 CREATE INDEX idx_mood ON search_history (mood);
 
+//VIDEO SECTION QUERIES
+CREATE TABLE videos (
+    id SERIAL PRIMARY KEY,
+    video_id VARCHAR(50) UNIQUE NOT NULL,       
+    title TEXT NOT NULL,                       
+    description TEXT,                           
+    channel_title VARCHAR(255) NOT NULL,        
+    published_at TIMESTAMP WITH TIME ZONE,     
+    thumbnail_default TEXT,                     
+    thumbnail_medium TEXT,                      
+    live_broadcast_content VARCHAR(20) DEFAULT 'none',  
+    created_at TIMESTAMP DEFAULT NOW(),         
+    updated_at TIMESTAMP DEFAULT NOW()
+);
 
+CREATE TABLE videos_history (
+   id SERIAL PRIMARY KEY,
+  query_text  VARCHAR(255),
+  mood  VARCHAR(50),
+  hits   INTEGER DEFAULT 1,
+  last_hit_at TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE INDEX idx_video_id ON videos(video_id);
+CREATE INDEX idx_channel_title ON videos(channel_title);
+CREATE INDEX idx_published_at ON videos(published_at);

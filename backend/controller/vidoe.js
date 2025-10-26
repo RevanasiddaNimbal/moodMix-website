@@ -1,95 +1,134 @@
 const { videoAPI } = require("../utils/api");
+const Videos = require("../model/video");
 
 const moodVedeosMap = {
   happy: [
-    "funny videos",
-    "happy songs playlist",
-    "uplifting short films",
-    "happy moments compilation",
-    "upbeat pop hits",
+    "upbeat happy songs playlist 2025",
+    "full-length feel-good movies",
+    "latest cheerful music videos",
+    "fun dance songs collection",
+    "uplifting family movies",
   ],
+
   sad: [
-    "emotional stories",
-    "heartbreak moments",
-    "slow sad songs playlist",
-    "melancholic music mix",
+    "emotional songs playlist full",
+    "tearjerker movies full length",
+    "heartbreaking music videos",
+    "sad romantic films",
+    "melancholic songs collection",
   ],
+
   calm: [
-    "peaceful instrumental music",
-    "meditation videos",
-    "calm study videos",
-    "lofi chill beats playlist",
+    "peaceful instrumental albums",
+    "meditation music full playlist",
+    "relaxing study songs",
+    "soothing background music videos",
+    "calm piano and guitar tracks",
   ],
+
   angry: [
-    "intense motivational videos",
-    "fight scene compilation",
-    "workout motivation playlist",
-    "angry rock music",
-    "high-energy hip hop",
+    "intense motivational music videos",
+    "high-energy workout songs",
+    "action movies full length",
+    "aggressive rock music albums",
+    "powerful rap and hip hop playlists",
   ],
+
   excited: [
-    "fun challenge videos",
-    "energetic songs playlist",
-    "thrilling short films",
-    "viral videos compilation",
-    "party hits mix",
+    "energetic party songs playlist",
+    "thrilling adventure movies",
+    "dance music albums full",
+    "fun challenge videos full",
+    "latest viral upbeat songs",
   ],
 };
-const cache = {};
-function setCache(cacheKey, data) {
-  cache[cacheKey] = data;
-  setTimeout(() => delete cache[cacheKey], 600000);
-}
 
-const fetchVideos = async (videoList) => {
-  const cacheKey = videoList.slice(0, 1);
-  if (cache[cacheKey]) {
-    console.log("Using cached data for:", cacheKey);
-    return cache[cacheKey];
-  }
-
-  const moodVideos = [];
-  for (const video of videoList.slice(0, 2)) {
-    const response = await videoAPI.get("/search", {
-      params: { part: "snippet", q: video, type: "video", maxResults: 5 },
-    });
-    console.log("Request sent :", video);
-    if (response.data && response.data.items) {
-      moodVideos.push(...response.data.items);
-    }
-  }
-
-  const uniqueVideos = {};
-  moodVideos.forEach((video) => {
-    uniqueVideos[video.id.videoId] = video;
-  });
-
-  const finalVideos = Object.values(uniqueVideos);
-  setCache(cacheKey, finalVideos);
-  return finalVideos;
-};
-exports.getVideos = async (req, res, next) => {
-  const { q, mood } = req.query;
-  let result = [];
-  const query = q?.trim().toLowerCase() || "";
-  const moodValue = mood?.trim().toLowerCase() || "";
-
+const fetchVideos = async (video) => {
+  if (!video) return [];
   try {
-    if (query) {
-      const response = await videoAPI.get("/search", {
-        params: { part: "snippet", q: query, type: "videos", maxResults: 50 },
-      });
+    const allvideos = [];
+    const response = await videoAPI.get("/search", {
+      params: { part: "snippet", q: video, type: "video", maxResults: 20 },
+    });
 
-      result = response.data.items;
-    } else if (moodValue && moodVedeosMap[moodValue]) {
-      const Videos = moodVedeosMap[moodValue];
-      result = await fetchVideos(Videos);
-    } else {
-      const Videos = moodVedeosMap["calm"];
-      result = await fetchVideos(Videos);
+    if (response.data && response.data.items) {
+      allvideos.push(...response.data.items);
+    }
+    return allvideos;
+  } catch (err) {
+    console.log("Error fetching videos:", err.message);
+    return [];
+  }
+};
+
+exports.getVideos = async (req, res, next) => {
+  try {
+    const { q, mood } = req.query;
+    let result = [];
+    const query = q?.trim().toLowerCase() || "";
+    const moodValue = mood?.trim().toLowerCase() || "";
+
+    await Videos.updateHistory(query, moodValue);
+
+    let videos = query ? await Videos.searchBykeywords(query) : [];
+    if (videos.length > 0) {
+      videos = await Videos.sortVideos(videos);
     }
 
-    if (!result.length) {
+    if (!query && moodValue) {
+      const categories = moodVedeosMap[moodValue];
+      const moodVideos = [];
+      for (const cat of categories) {
+        const result = await Videos.searchBykeywords(cat.trim().toLowerCase());
+        if (result.length > 0) {
+          moodVideos.push(...result);
+        }
+      }
+      videos = [...moodVideos];
+    }
+
+    if (!query && !moodValue) {
+      console.log("No query or mood provided, fetching default happy videos.");
+      const categories = moodVedeosMap["happy"];
+      let moodVideos = [];
+      for (const cat of categories) {
+        const result = await Videos.searchBykeywords(
+          cat.trim().toLocaleLowerCase()
+        );
+
+        if (result.length > 0) {
+          moodVideos.push(...result);
+        }
+      }
+
+      videos = [...moodVideos];
+    }
+
+    if (videos.length === 0) {
+      if (query) {
+        const response = await videoAPI.get("/search", {
+          params: { part: "snippet", q: query, type: "videos", maxResults: 50 },
+        });
+
+        const storedVideos = await Videos.storeVideos(response.data.items);
+        const sortedVideos = await Videos.sortVideos(storedVideos);
+        videos = [...sortedVideos];
+      } else {
+        const categories = moodValue
+          ? moodVedeosMap[moodValue]
+          : moodVedeosMap["happy"];
+        let moodVideos = [];
+        for (const cat of categories) {
+          const fetchedVideos = await fetchVideos(cat);
+          if (fetchedVideos && fetchedVideos.length > 0) {
+            moodVideos = moodVideos.concat(fetchVideos);
+          }
+        }
+        videos = [...moodVideos];
+      }
+    }
+    console.log("Total videos fetched:", videos.length);
+    if (!videos || videos.length === 0) {
       return res.status(400).json({
         success: false,
         error: "Error fetching videos.",
@@ -97,7 +136,7 @@ exports.getVideos = async (req, res, next) => {
     }
     res.status(200).json({
       success: true,
-      data: result,
+      data: videos,
     });
   } catch (err) {
     console.log("Error : ", err.stack);

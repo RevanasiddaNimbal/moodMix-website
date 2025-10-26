@@ -1,11 +1,11 @@
-import styles from "./videosList.module.css";
+import styles from "./VideoList.module.css";
 import { useNavigate } from "react-router-dom";
 
 export default function VideosList({ videos }) {
   const navigate = useNavigate();
 
   const handleVideoClick = (video) => {
-    navigate(`/videos/watch/${video?.id?.videoId}`, {
+    navigate(`/videos/watch/${video?.id}`, {
       state: { selected: video, videos: videos },
     });
   };
@@ -18,31 +18,29 @@ export default function VideosList({ videos }) {
         <div className={styles.videoGrid}>
           {videos.map((video) => (
             <div
-              key={video.id.videoId}
+              key={video.video_id}
               className={styles.videoCard}
               onClick={() => handleVideoClick(video)}
             >
               <div className={styles.thumbnailWrapper}>
                 <img
-                  src={video.snippet?.thumbnails?.medium?.url}
-                  alt={video.snippet?.title}
+                  src={video?.thumbnail_medium || video?.thumbnail_default}
+                  alt={video?.title}
                   className={styles.thumbnail}
                   loading="lazy"
                 />
-                {video.snippet?.liveBroadcastContent === "live" && (
+                {video?.liveBroadcastContent === "live" && (
                   <span className={styles.liveBadge}>LIVE</span>
                 )}
               </div>
 
               <div className={styles.videoInfo}>
-                <h3 className={styles.title}>{video.snippet?.title}</h3>
+                <h3 className={styles.title}>{video?.title}</h3>
                 <div className={styles.meta}>
-                  <p className={styles.channel}>
-                    {video.snippet?.channelTitle}
-                  </p>
+                  <p className={styles.channel}>{video?.channel_title}</p>
                   <p className={styles.date}>
-                    {video.snippet?.publishedAt
-                      ? new Date(video.snippet.publishedAt).toLocaleDateString()
+                    {video?.published_at
+                      ? new Date(video?.published_at).toLocaleDateString()
                       : ""}
                   </p>
                 </div>

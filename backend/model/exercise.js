@@ -25,11 +25,11 @@ const exercises = {
   },
 
   storeExercises: async (exercisesArray = []) => {
-    if (!exercisesArray || exercisesArray.length === 0) return [];
-    const storedExercises = [];
+    try {
+      if (!exercisesArray || exercisesArray.length === 0) return [];
+      const storedExercises = [];
 
-    for (const exercise of exercisesArray) {
-      try {
+      for (const exercise of exercisesArray) {
         const {
           id: external_id,
           name,
@@ -64,10 +64,11 @@ const exercises = {
         if (result.rows.length > 0) {
           storedExercises.push(result.rows[0]);
         }
-        return storedExercises;
-      } catch (err) {
-        console.log("Error storing exercise:", err.message);
       }
+      return storedExercises;
+    } catch (err) {
+      console.log("Error storing exercise:", err.message);
+      return [];
     }
   },
 
@@ -86,6 +87,7 @@ const exercises = {
       let allResults = [];
 
       for (const word of keywords) {
+        if (!word) continue;
         const result = await pool.query(
           `
         SELECT 
@@ -131,9 +133,7 @@ const exercises = {
       return finalResults;
     } catch (err) {
       console.log("Error searching exercises:", err.message);
-      return {
-        error: true,
-      };
+      return [];
     }
   },
 
@@ -169,7 +169,7 @@ const exercises = {
 
       if (allResults.length === 0) {
         const fallback = await pool.query(
-          `SELECT * FROM exercises ORDER BY updated_at DESC LIMIT 100;`
+          `SELECT * FROM exercises ORDER BY updated_at DESC LIMIT 100`
         );
         allResults = fallback.rows;
       }
@@ -177,8 +177,15 @@ const exercises = {
       for (const exercise of allResults) {
         uniqueExercises[exercise.id] = exercise;
       }
+      const finalResults = Object.values(uniqueExercises).sort((a, b) => {
+        const dateA = new Date(a.updated_at);
+        const dateB = new Date(b.updated_at);
 
-      return Object.values(uniqueExercises);
+        if (dateB - dateA !== 0) return dateB - dateA;
+
+        return (b.search_hits || 0) - (a.search_hits || 0);
+      });
+      return finalResults;
     } catch (err) {
       console.log("Error fetching updated exercises:", err.message);
       return exercises || [];

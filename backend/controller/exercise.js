@@ -36,7 +36,7 @@ exports.getExercises = async (req, res) => {
     }
 
     if (!query && moodValue) {
-      const categories = moodMap[moodValue] || moodMap["happy"];
+      const categories = moodMap[moodValue];
       let moodExercises = [];
 
       for (const cat of categories) {
