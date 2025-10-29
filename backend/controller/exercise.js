@@ -70,9 +70,7 @@ exports.getExercises = async (req, res) => {
 
         exercises = [...sortedExercises];
       } else {
-        const categories = moodMap[moodValue]
-          ? moodMap[moodValue]
-          : moodMap["happy"];
+        const categories = moodMap[moodValue] || moodMap["happy"];
         let exerciseData = [];
 
         for (const cat of categories.slice(0, 2)) {
@@ -98,7 +96,12 @@ exports.getExercises = async (req, res) => {
       });
     }
 
-    res.status(200).json(exercises);
+    const uniqueExercises = {};
+    for (const exercise of exercises) {
+      uniqueExercises[exercise.external_id] = exercise;
+    }
+
+    res.status(200).json(Object.values(uniqueExercises));
   } catch (err) {
     console.error("Error fetching exercises:", err);
     res

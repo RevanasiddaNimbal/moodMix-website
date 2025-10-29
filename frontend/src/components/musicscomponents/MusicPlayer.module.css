@@ -1,494 +1,428 @@
-.playerContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #1f2937;
-  color: white;
-  padding: 10px 16px;
-  width: 100%;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  z-index: 100;
-  gap: 12px;
-  flex-wrap: nowrap;
+:root {
+  --bg-color: #0f2d37; /* Dark teal background from image */
+  --card-color: transparent; /* Overlay card is transparent to the background */
+  --bar-color: rgba(28, 28, 28, 0.9);
+  --primary-text: #ffffff;
+  --secondary-text: #b3b3b3;
+  --accent-color: #ffffff; /* White for the play button and progress */
+  --slider-track: rgba(255, 255, 255, 0.3);
+  --slider-thumb: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --card-radius: 16px;
+  --bar-height: 72px;
+  --transition-speed: 300ms;
 }
 
-.playerContainer[data-collapsed="true"] {
-  cursor: pointer;
+/* Base body style for the background */
+body {
+  background-color: var(--bg-color);
 }
 
-.left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 150px;
-  max-width: 30%;
-  overflow: hidden;
-}
-
-.cover {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.info h4 {
-  font-size: 14px;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.info p {
-  font-size: 12px;
-  opacity: 0.7;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex: 1;
-  min-width: 200px;
-  justify-content: center;
-}
-
-.controls button {
+.controlButton {
   background: none;
   border: none;
-  color: white;
-  font-size: 20px;
+  color: var(--secondary-text);
   cursor: pointer;
+  padding: 4px;
+  transition: color 200ms ease, transform 200ms ease;
+}
+.controlButton svg {
+  width: 24px;
+  height: 24px;
+}
+.controlButton:hover {
+  color: var(--primary-text);
 }
 
-.time {
-  font-size: 12px;
-  min-width: 60px;
-  text-align: center;
-}
-
-.seekbar {
-  flex: 1;
-  position: relative;
-  height: 6px;
-  background: #374151;
-  border-radius: 999px;
-  cursor: pointer;
-  max-width: 300px;
-}
-
-.progress {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 6px;
-  background: #22c55e;
-  border-radius: 999px;
-}
-
-.seekThumb {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 14px;
-  height: 14px;
-  background: white;
+.playButton {
+  background-color: var(--accent-color);
+  color: #000000; /* Black icon for the play button */
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-}
-
-.likeDislike {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-right: 12px;
-}
-
-.likeDislike button {
-  all: unset; /* resets all browser styles */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  transition: transform 0.2s;
-}
-.likeDislike button:hover {
-  transform: scale(1.1);
-}
-
-.likeDislike svg {
-  width: 28px;
-  height: 28px;
-}
-
-.likeDislike .active svg {
-  color: #22c55e;
-  stroke: #22c55e;
-}
-
-.volumeWrapper {
-  display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 120px;
-  justify-content: flex-end;
-  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 200ms ease;
 }
-
-.muteButton {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
+.playButton:hover {
+  transform: scale(1.05);
 }
-
-.volumeContainer {
-  position: relative;
-  width: 80px;
-  height: 6px;
-  background: #374151;
-  border-radius: 999px;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.volumeWrapper:hover .volumeContainer {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.volumeFill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 6px;
-  background: #22c55e;
-  border-radius: 999px;
-}
-
-.volumeThumb {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 14px;
-  height: 14px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-}
-
-.volumeLabel {
-  font-size: 12px;
-}
-
-.speedMenuWrapper {
-  position: relative;
-}
-
-.speedButton {
-  background: #111827;
-  color: #e5e7eb;
-  border: 1px solid #374151;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.speedMenu {
-  position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #111827;
-  border: 1px solid #374151;
-  border-radius: 8px;
-  padding: 6px;
-  display: flex;
-  gap: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  z-index: 101;
-}
-
-.speedItem {
-  background: #1f2937;
-  color: #e5e7eb;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.speedItemActive {
-  background: #22c55e;
-  color: #111827;
-}
-
-.detailsToggle {
-  background: none;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  display: none; /* hidden by default; shown on mobile via media query */
-}
-
-.mobileOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-}
-
-.overlayBackdrop {
-  position: absolute;
-  inset: 0;
-  background-position: center;
-  background-size: cover;
-  filter: blur(30px);
-  transform: scale(1.1);
-  opacity: 0.4;
-}
-
-.overlayInner {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  padding: 24px 20px 28px;
-  color: #f9fafb;
-}
-
-.overlayTopBar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+.playButton svg {
+  width: 32px;
   height: 32px;
 }
 
-.overlayClose {
-  all: unset;
-  display: inline-flex;
+.progress {
+  width: 100%;
+}
+.seekBar {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px; /* Thinner seek bar */
+  background: var(--slider-track);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+.seekBar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--progress, 0%);
+  background-color: var(--accent-color);
+  border-radius: 99px;
+  transition: width 100ms linear;
+}
+.seekBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; /* Slightly smaller thumb */
+  height: 14px;
+  background: var(--slider-thumb);
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -5px; /* Adjust thumb position */
+  position: relative;
+  z-index: 2;
+  transition: transform 200ms ease;
+}
+.seekBar:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+.timeStamps {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  margin-top: 4px;
+}
+
+.volumeButton {
+  background: none;
+  border: none;
+  color: var(--secondary-text);
+  cursor: pointer;
+  padding: 0;
+}
+.volumeButton svg {
+  width: 22px;
+  height: 22px;
+}
+.volumeSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  flex-grow: 1;
+  height: 4px;
+  background: var(--slider-track);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+.volumeSlider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--volume, 80%);
+  background-color: var(--primary-text);
+  border-radius: 99px;
+}
+.volumeSlider:hover::before {
+  background-color: var(--accent-color);
+}
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--slider-thumb);
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -4px;
+  position: relative;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.playerCard:hover .volumeSlider::-webkit-slider-thumb,
+.bottomBar:hover .volumeSlider::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.speedSelect {
+  background-color: var(--slider-track);
+  color: var(--primary-text);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+/* --- Overlay / Expanded Player Styles --- */
+.overlay {
+  position: fixed;
+  top: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-color);
+  z-index: 100;
+  transition: top var(--transition-speed) ease-in-out;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 24px; /* Adjust padding */
+}
+.playerRoot[data-expanded="true"] .overlay {
+  top: 0;
+}
+.overlayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--secondary-text);
+  text-align: center;
+  padding: 16px 0;
+}
+.overlayHeader .header-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+.overlayHeader .header-subtitle {
+  font-size: 0.9rem;
+  color: var(--primary-text);
+  font-weight: 500;
+}
+.overlayButton {
+  background: none;
+  border: none;
+  color: var(--secondary-text);
+  padding: 8px;
+}
+.overlayButton svg {
+  width: 28px;
+  height: 28px;
+  margin-top: 15px;
+}
+
+.playerCard {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: var(--card-color);
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows card to fill vertical space */
+  justify-content: space-around; /* Distributes items evenly with space around them */
+  min-height: 0; /* Prevents flexbox from overflowing on very short screens */
+}
+.artworkWrapper {
+  width: 100%;
+  padding-top: 100%;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0; /* Prevents artwork from shrinking */
+}
+.artwork {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #2a4b55;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  color: #e5e7eb;
-  background: rgba(17, 24, 39, 0.6);
+}
+.artwork svg {
+  width: 50%;
+  height: 50%;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.overlayCover {
-  width: min(78vw, 320px);
-  height: min(78vw, 320px);
-  object-fit: cover;
-  border-radius: 14px;
-  align-self: center;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  margin-top: 8px;
+.infoAndActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
-
-.overlayInfo {
-  margin-top: 18px;
+.trackInfo {
   text-align: left;
+  flex-grow: 1;
+  min-width: 0;
 }
-
-.overlayTitle {
+.title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary-text);
   margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.artist {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--secondary-text);
+  margin: 4px 0 0;
+}
+.mainControls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 16px;
+}
+.secondaryControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.overlayArtist {
-  margin: 4px 0 0 0;
-  font-size: 14px;
-  color: #9ca3af;
+/* --- Bottom Bar Styles --- */
+.playerRoot {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
 }
-
-.overlaySeekSection {
-  margin-top: 18px;
-}
-
-.seekbarLarge {
-  height: 8px;
-  max-width: none;
-  background: rgba(55, 65, 81, 0.8);
-}
-
-.seekbarLarge .progress {
-  height: 8px;
-  background: #ffffff;
-}
-
-.seekbarLarge .seekThumb {
-  width: 16px;
-  height: 16px;
-  background: #ffffff;
-}
-
-.overlayTimes {
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bar-height);
+  background-color: var(--bar-color);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #e5e7eb;
-  font-size: 12px;
-  margin-top: 8px;
+  padding: 0 16px;
+  gap: 16px;
+  transition: transform var(--transition-speed) ease-in-out;
+}
+.playerRoot[data-expanded="true"] .bottomBar {
+  transform: translateY(100%);
 }
 
-.overlayControls {
-  margin-top: auto;
+.bottomBarLeft {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
-  padding-bottom: 8px;
+  gap: 12px;
+  min-width: 0;
 }
-
-.smallControl {
-  all: unset;
+.smallArtwork {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.smallTrackInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.smallTitle {
+  color: var(--primary-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.smallArtist {
+  color: var(--secondary-text);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bottomBarCenter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.barControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.barPlayButton svg {
+  width: 24px;
+  height: 24px;
+}
+.barPlayButton {
   width: 40px;
   height: 40px;
-  border-radius: 999px;
-  display: inline-flex;
+}
+.bottomBarRight {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  color: #e5e7eb;
-  background: rgba(17, 24, 39, 0.6);
-  font-size: 20px;
+  gap: 16px;
 }
 
-.playCircle {
-  all: unset;
-  width: 72px;
-  height: 72px;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #111827;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+.desktopOnly {
+  display: none;
+}
+.mobileOnly {
+  display: block;
 }
 
-@media (max-width: 768px) {
-  .playerContainer {
-    flex-direction: row;
-    align-items: center;
-    padding: 8px 12px;
-    gap: 12px;
+/* --- Breakpoint for Laptops/Desktops --- */
+@media (min-width: 1024px) {
+  .mobileOnly {
+    display: none;
+  }
+  .desktopOnly {
+    display: flex;
   }
 
-  .left {
+  /* On desktop, never expand the player */
+  .playerRoot[data-expanded="true"] .overlay {
+    top: 100%;
+  }
+  .playerRoot[data-expanded="true"] .bottomBar {
+    transform: translateY(0);
+  }
+
+  .bottomBar {
+    padding: 0 4px;
+    gap: 2px;
+  }
+  .bottomBarCenter {
+    flex-grow: 1;
+    justify-content: flex-start;
+  }
+  .bottomBarCenter .progress {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    width: 60%;
-    overflow: hidden;
-  }
-
-  .cover {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-  }
-
-  .info {
-    overflow: hidden;
-    flex-shrink: 1;
-    min-width: 0; /* necessary for text-overflow to work in flex */
-  }
-
-  .info h4,
-  .info p {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0;
-  }
-
-  .controls {
     gap: 12px;
-    flex: 1;
-    justify-content: flex-end;
+    width: 100%;
+    max-width: 500px;
+  }
+  .timeStampsDesktop {
+    font-size: 0.75rem;
+    color: var(--secondary-text);
   }
 
-  .controls > button:not(.prev):not(.play):not(.next) {
-    display: none;
+  .barControls {
+    order: -1;
   }
-
-  .seekbar,
-  .time {
-    display: none;
+  .volumeControls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 150px;
   }
-
-  .likeDislike,
-  .volumeWrapper,
-  .speedMenuWrapper {
-    display: none;
-  }
-}
-
-@media (min-width: 769px) {
-  .speedMenu {
-    bottom: 140%;
-  }
-
-  .detailsToggle {
-    display: none;
-  }
-
-  .mobileOverlay {
-    display: none;
-  }
-}
-.fullscreen-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #111;
-  color: white;
-}
-
-.fullscreenBtn {
-  background: none;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  transition: transform 0.2s ease;
-}
-
-.fullscreenBtn:hover {
-  transform: scale(1.1);
 }

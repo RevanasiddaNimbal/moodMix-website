@@ -5,7 +5,7 @@ export default function VideosList({ videos }) {
   const navigate = useNavigate();
 
   const handleVideoClick = (video) => {
-    navigate(`/videos/watch/${video?.id}`, {
+    navigate(`/videos/watch/${video?.video_id}`, {
       state: { selected: video, videos: videos },
     });
   };
@@ -16,9 +16,9 @@ export default function VideosList({ videos }) {
         <p className={styles.noVideos}>No videos found.</p>
       ) : (
         <div className={styles.videoGrid}>
-          {videos.map((video) => (
+          {videos.map((video, index) => (
             <div
-              key={video.video_id}
+              key={video?.video_id || index}
               className={styles.videoCard}
               onClick={() => handleVideoClick(video)}
             >

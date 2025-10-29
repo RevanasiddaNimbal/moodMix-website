@@ -1,4 +1,5 @@
 const { musicAPI } = require("../utils/api");
+const Musics = require("../model/music");
 
 const moodMusicMap = {
   happy: [
@@ -44,59 +45,104 @@ const moodMusicMap = {
     "Yo Yo Honey Singh - Desi Kalakaar (Hindi)",
   ],
 };
-const fetchMusics = async (musics) => {
-  const moodmusics = [];
-  for (const music of musics) {
+
+const fetchMusics = async (query) => {
+  try {
+    if (!query) return [];
     const response = await musicAPI.get("/search/tracks", {
       params: {
-        q: music,
+        q: query,
         client_id: process.env.CLIENT_ID,
         limit: 30,
       },
     });
-    if (response.data && response.data.collection) {
-      moodmusics.push(...response.data.collection);
-    }
+    return response.data.collection;
+  } catch (err) {
+    console.log("Error fetching musics:", err.message);
+    return [];
   }
-  const uniqueTracks = {};
-  moodmusics.forEach((track) => {
-    uniqueTracks[track.id] = track;
-  });
-
-  return Object.values(uniqueTracks);
 };
-exports.getMusics = async (req, res, next) => {
-  const query = req.body?.q?.trim();
-  const mood = req.body?.mood;
 
+exports.getMusics = async (req, res, next) => {
   try {
-    let data;
-    if (query) {
-      const response = await musicAPI.get("/search/tracks", {
-        params: {
-          q: query,
-          limit: 30,
-        },
-      });
-      data = response.data.collection;
-    } else if (mood && moodMusicMap[mood]) {
-      const musics = moodMusicMap[mood];
-      data = await fetchMusics(musics);
-    } else {
-      const musics = moodMusicMap["calm"];
-      data = await fetchMusics(musics);
+    const query = req.body?.q?.trim();
+    const mood = req.body?.mood;
+    console.log("mood:", mood);
+
+    await Musics.updateHistory(query, mood);
+
+    let musicData = query ? await Musics.searchBykeywords(query) : [];
+    if (musicData.length > 0) {
+      musicData = await Musics.sortMusics(musicData);
     }
 
-    if (!data || !data.length) {
+    if (!query && mood) {
+      const categories = moodMusicMap[mood];
+      const moodMusics = [];
+      for (const cat of categories) {
+        console.log("Fetching musics for category:", cat);
+        const result = await Musics.searchBykeywords(cat.trim().toLowerCase());
+        if (result.length > 0) {
+          moodMusics.push(...result);
+        }
+      }
+      musicData = [...moodMusics];
+    }
+
+    if (!query && !mood) {
+      const categories = moodMusicMap["calm"];
+      let moodMusics = [];
+      for (const cat of categories) {
+        const result = await Musics.searchBykeywords(cat.trim().toLowerCase());
+        if (result.length > 0) {
+          moodMusics.push(...result);
+        }
+      }
+      musicData = [...moodMusics];
+    }
+
+    if (musicData.length === 0) {
+      if (query) {
+        const response = await musicAPI.get("/search/tracks", {
+          params: {
+            q: query,
+            limit: 30,
+          },
+        });
+        const storedMusics = await Musics.storeMusics(response.data.collection);
+        const sortedMusics = await Musics.sortMusics(storedMusics);
+        musicData = [...sortedMusics];
+      } else {
+        const categories = moodMusicMap[mood] || moodMusicMap["calm"];
+
+        let moodMusics = [];
+        for (const cat of categories) {
+          const response = await fetchMusics(cat.trim().toLowerCase());
+          const storedMusics = await Musics.storeMusics(response);
+          if (storedMusics.length > 0) {
+            moodMusics.push(...storedMusics);
+          }
+        }
+        const sortedMusics = await Musics.sortMusics(moodMusics);
+        musicData = [...sortedMusics];
+      }
+    }
+
+    if (!musicData || musicData.length === 0) {
       return res.status(500).json({
         success: false,
         error: "No songs found",
       });
     }
 
+    const uniqueMusics = {};
+    musicData.forEach((music) => {
+      uniqueMusics[music.music_id] = music;
+    });
+
     res.status(200).json({
       success: true,
-      data: data,
+      data: Object.values(uniqueMusics),
     });
   } catch (err) {
     console.error(err.stack);
@@ -107,40 +153,62 @@ exports.getMusics = async (req, res, next) => {
 exports.getTrackInfo = async (req, res, next) => {
   try {
     const trackId = req.params.id;
-    const response = await musicAPI.get(`/tracks/${trackId}`);
-    if (!response.data) {
-      return res.status(500).json({
-        success: false,
-        error: "Failed to get the track.",
-      });
+    if (!trackId) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Track ID is required" });
     }
 
-    const track = response.data;
+    let track = await Musics.getTrackById(trackId);
 
-    const progressiveTrans = track.media.transcodings.find(
-      (t) => t.format.protocol == "progressive"
-    );
-
-    let playableUrl = null;
-
-    if (progressiveTrans) {
-      const transRes = await musicAPI.get(progressiveTrans.url, {
+    if (!track || !track.progressive_url) {
+      const response = await musicAPI.get(`/tracks/${trackId}`, {
         params: { client_id: process.env.CLIENT_ID },
       });
-      playableUrl = transRes.data.url;
+
+      if (!response.data) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Track not found" });
+      }
+      if (!track) {
+        const storedTracks = await Musics.storeMusics([response.data]);
+        track = storedTracks[0];
+      }
+
+      let progressiveUrl = track.progressive_url;
+      if (!progressiveUrl) {
+        const progressiveTrans = response.data.media.transcodings.find(
+          (t) => t.format.protocol === "progressive"
+        );
+
+        if (progressiveTrans) {
+          const transRes = await musicAPI.get(progressiveTrans.url, {
+            params: { client_id: process.env.CLIENT_ID },
+          });
+          progressiveUrl = await Musics.updateProgressiveUrl(
+            track.music_id,
+            transRes.data.url
+          );
+        }
+      }
+
+      track.progressive_url = progressiveUrl;
     }
-    const trackinfo = {
+
+    const trackInfo = {
       title: track.title,
       duration: track.duration,
       artwork: track.artwork_url,
       genre: track.genre,
       permalink: track.permalink_url,
-      artist: track.user?.full_name,
-      artistAvatar: track.user?.avatar_url,
+      artist: track.artist_name || track.username,
+      artistAvatar: track.artist_avatar,
       streamable: track.streamable,
-      progressiveUrl: playableUrl,
+      progressiveUrl: track.progressive_url,
     };
-    res.status(200).json({ success: true, data: trackinfo });
+
+    res.status(200).json({ success: true, data: trackInfo });
   } catch (err) {
     console.error(err.stack);
     next(err);

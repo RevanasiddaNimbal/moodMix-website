@@ -112,7 +112,7 @@ const videos = {
 
       const uniqueVideos = {};
       for (const video of allvideos) {
-        uniqueVideos[video.id] = video;
+        uniqueVideos[video.video_id] = video;
       }
       const finalResults = Object.values(uniqueVideos).sort((a, b) => {
         if (b.search_hits !== a.search_hits)
@@ -148,7 +148,7 @@ const videos = {
             ON LOWER(v.title) LIKE '%' || LOWER(vh.query_text) || '%'
           WHERE LOWER(v.title) LIKE '%' || $1 || '%'
           ORDER BY vh.hits DESC, v.published_at DESC
-          LIMIT 100;
+          LIMIT 50;
           `,
           [query]
         );
@@ -161,13 +161,13 @@ const videos = {
       if (allResults.length === 0) {
         console.log("fetching fallback videos");
         const fallback = await pool.query(
-          `SELECT * FROM videos ORDER BY updated_at DESC LIMIT 100`
+          `SELECT * FROM videos ORDER BY updated_at DESC LIMIT 50`
         );
         allResults = fallback.rows;
       }
       const uniqueVideos = {};
       for (const video of allResults) {
-        uniqueVideos[video.id] = video;
+        uniqueVideos[video.video_id] = video;
       }
       const finalResults = Object.values(uniqueVideos).sort((a, b) => {
         const dateA = new Date(a.updated_at || a.published_at);

@@ -4,7 +4,7 @@ import styles from "./MusicItem.module.css";
 export default function MusicItem({ song, onPlaySong, isActive }) {
   const handleClick = async () => {
     try {
-      const res = await axios.get(`/musics/stream/${song.id}`);
+      const res = await axios.get(`/musics/stream/${song.music_id}`);
       if (res.data.success) onPlaySong(res.data.data);
     } catch (err) {
       console.error(err.message);

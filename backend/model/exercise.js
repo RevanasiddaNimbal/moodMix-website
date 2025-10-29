@@ -116,11 +116,8 @@ const exercises = {
           allResults = allResults.concat(result.rows);
         }
       }
-      const uniqueExercises = {};
-      for (const ex of allResults) {
-        uniqueExercises[ex.id] = ex;
-      }
-      const finalResults = Object.values(uniqueExercises).sort((a, b) => {
+
+      const finalResults = allResults.sort((a, b) => {
         if (b.search_hits !== a.search_hits)
           return b.search_hits - a.search_hits;
         if (a.matched_mood === moodValue && b.matched_mood !== moodValue)
@@ -173,11 +170,8 @@ const exercises = {
         );
         allResults = fallback.rows;
       }
-      const uniqueExercises = {};
-      for (const exercise of allResults) {
-        uniqueExercises[exercise.id] = exercise;
-      }
-      const finalResults = Object.values(uniqueExercises).sort((a, b) => {
+
+      const finalResults = allResults.sort((a, b) => {
         const dateA = new Date(a.updated_at);
         const dateB = new Date(b.updated_at);
 

@@ -160,7 +160,7 @@ export default function DetectExpression({ onResult }) {
 
         <div
           className={`${styles.card} ${styles.exited} `}
-          onClick={() => handleUserSelect("exited")}
+          onClick={() => handleUserSelect("excited")}
         >
           <div className={styles.cardIcon}>
             <div className={styles.shape}>🤩</div>

@@ -64,7 +64,6 @@ const fetchVideos = async (video) => {
 exports.getVideos = async (req, res, next) => {
   try {
     const { q, mood } = req.query;
-    let result = [];
     const query = q?.trim().toLowerCase() || "";
     const moodValue = mood?.trim().toLowerCase() || "";
 
@@ -107,7 +106,7 @@ exports.getVideos = async (req, res, next) => {
     if (videos.length === 0) {
       if (query) {
         const response = await videoAPI.get("/search", {
-          params: { part: "snippet", q: query, type: "videos", maxResults: 50 },
+          params: { part: "snippet", q: query, type: "video", maxResults: 50 },
         });
 
         const storedVideos = await Videos.storeVideos(response.data.items);
@@ -121,7 +120,7 @@ exports.getVideos = async (req, res, next) => {
         for (const cat of categories) {
           const fetchedVideos = await fetchVideos(cat);
           if (fetchedVideos && fetchedVideos.length > 0) {
-            moodVideos = moodVideos.concat(fetchVideos);
+            moodVideos = moodVideos.concat(fetchedVideos);
           }
         }
         videos = [...moodVideos];
