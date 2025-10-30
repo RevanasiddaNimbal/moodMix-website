@@ -3,7 +3,7 @@ import axios from "../../api/axios";
 import { useEffect, useState } from "react";
 import Timer from "./Timer";
 import ResendOtp from "./ResendOtp";
-import styles from "./verifyOtp.module.css";
+import styles from "./VerifyOtp.module.css";
 import { showMessage } from "../Message";
 
 export default function VerifyOtp() {

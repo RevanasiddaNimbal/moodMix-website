@@ -16,7 +16,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://192.168.137.1:5173",
-      "https://moodmix.onrender.com",
+      "https://moodmix-website.netlify.app",
     ],
     credentials: true,
   })

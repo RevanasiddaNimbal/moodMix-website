@@ -1,5 +1,5 @@
 import { Headphones, Twitter, Instagram, Youtube, Github } from "lucide-react";
-import styles from "./footer.module.css";
+import styles from "./Footer.module.css";
 
 export default function Footer() {
   return (

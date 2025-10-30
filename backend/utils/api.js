@@ -16,7 +16,7 @@ const exerciseAPI = axios.create({
 });
 
 const videoAPI = axios.create({
-  baseURL: "https://www.googleapis.com/youtube/v3/",
+  baseURL: "https://www.googleapis.com/youtube/v3",
   params: {
     key: process.env.VIDEOAPI_KEY,
   },

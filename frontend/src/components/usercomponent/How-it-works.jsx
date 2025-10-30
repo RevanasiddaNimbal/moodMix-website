@@ -1,5 +1,5 @@
 import { Camera, Brain, Headphones } from "lucide-react";
-import styles from "./how-it-works.module.css";
+import styles from "./How-it-works.module.css";
 
 const steps = [
   {

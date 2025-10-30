@@ -3,7 +3,7 @@ const Videos = require("../model/video");
 
 const moodVedeosMap = {
   happy: [
-    "upbeat happy songs playlist 2025",
+    "kannada songs ",
     "full-length feel-good movies",
     "latest cheerful music videos",
     "fun dance songs collection",
@@ -56,7 +56,7 @@ const fetchVideos = async (video) => {
     }
     return allvideos;
   } catch (err) {
-    console.log("Error fetching videos:", err.message);
+    console.log("Error fetching videos:", err.stack);
     return [];
   }
 };
@@ -78,9 +78,11 @@ exports.getVideos = async (req, res, next) => {
       const categories = moodVedeosMap[moodValue];
       const moodVideos = [];
       for (const cat of categories) {
+        console.log("Fetching videos for category:", cat);
         const result = await Videos.searchBykeywords(cat.trim().toLowerCase());
         if (result.length > 0) {
-          moodVideos.push(...result);
+          const sortedResult = await Videos.sortVideos(result);
+          moodVideos.push(...sortedResult);
         }
       }
       videos = [...moodVideos];
@@ -96,7 +98,8 @@ exports.getVideos = async (req, res, next) => {
         );
 
         if (result.length > 0) {
-          moodVideos.push(...result);
+          const sortedResult = await Videos.sortVideos(result);
+          moodVideos.push(...sortedResult);
         }
       }
 
@@ -119,11 +122,14 @@ exports.getVideos = async (req, res, next) => {
         let moodVideos = [];
         for (const cat of categories) {
           const fetchedVideos = await fetchVideos(cat);
-          if (fetchedVideos && fetchedVideos.length > 0) {
-            moodVideos = moodVideos.concat(fetchedVideos);
+          const storedVideos = await Videos.storeVideos(fetchedVideos);
+          if (storedVideos && storedVideos.length > 0) {
+            moodVideos = moodVideos.concat(storedVideos);
           }
         }
-        videos = [...moodVideos];
+
+        const sortedVideos = await Videos.sortVideos(storedVideos);
+        videos = [...sortedVideos];
       }
     }
     console.log("Total videos fetched:", videos.length);
