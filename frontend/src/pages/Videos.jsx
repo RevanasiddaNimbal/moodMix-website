@@ -27,7 +27,6 @@ export default function Video() {
 
         if (response.status === 200 && response.data?.success) {
           setVideos(response.data.data);
-          console.log("Fetched videos:", response.data.data);
         } else {
           setVideos([]);
         }

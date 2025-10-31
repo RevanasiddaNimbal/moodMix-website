@@ -3,43 +3,43 @@ const Videos = require("../model/video");
 
 const moodVedeosMap = {
   happy: [
-    "kannada songs ",
-    "full-length feel-good movies",
-    "latest cheerful music videos",
-    "fun dance songs collection",
-    "uplifting family movies",
+    "best feel-good kannada songs full video",
+    "funny comedy movie scenes full",
+    "joyful music video mix 2025 full length",
+    "upbeat dance hits collection 2025 full songs",
+    "heartwarming friendship short film full length",
   ],
 
   sad: [
-    "emotional songs playlist full",
-    "tearjerker movies full length",
-    "heartbreaking music videos",
-    "sad romantic films",
-    "melancholic songs collection",
+    "emotional kannada love songs jukebox",
+    "sad melody songs collection full album",
+    "heart-touching breakup story short film full",
+    "painful romantic movie scenes full length",
+    "melancholy acoustic cover performances full video",
   ],
 
   calm: [
-    "peaceful instrumental albums",
-    "meditation music full playlist",
-    "relaxing study songs",
-    "soothing background music videos",
-    "calm piano and guitar tracks",
+    "peaceful nature background video with soft music full",
+    "deep sleep meditation music 2 hours non stop",
+    "rain sounds with lo-fi chill beats full playlist",
+    "calm piano and flute instrumentals full album",
+    "relaxing morning yoga music 1 hour",
   ],
 
   angry: [
-    "intense motivational music videos",
-    "high-energy workout songs",
-    "action movies full length",
-    "aggressive rock music albums",
-    "powerful rap and hip hop playlists",
+    "high energy rock and metal live performance full concert",
+    "powerful workout motivation mix full",
+    "aggressive rap cypher full session",
+    "motivational movie scenes hindi dubbed full length",
+    "epic action background score cinematic playlist full",
   ],
 
   excited: [
-    "energetic party songs playlist",
-    "thrilling adventure movies",
-    "dance music albums full",
-    "fun challenge videos full",
-    "latest viral upbeat songs",
+    "party dance mix 2025 non stop full songs",
+    "latest kannada mass songs jukebox full",
+    "festival celebration music videos full length",
+    "energetic edm mix 2025 full dj set",
+    "adventure travel vlogs cinematic full video",
   ],
 };
 
@@ -112,8 +112,8 @@ exports.getVideos = async (req, res, next) => {
           params: { part: "snippet", q: query, type: "video", maxResults: 50 },
         });
 
-        const storedVideos = await Videos.storeVideos(response.data.items);
-        const sortedVideos = await Videos.sortVideos(storedVideos);
+        await Videos.storeVideos(response.data.items);
+        const sortedVideos = await Videos.sortVideos(response.data.items);
         videos = [...sortedVideos];
       } else {
         const categories = moodValue
@@ -122,13 +122,13 @@ exports.getVideos = async (req, res, next) => {
         let moodVideos = [];
         for (const cat of categories) {
           const fetchedVideos = await fetchVideos(cat);
-          const storedVideos = await Videos.storeVideos(fetchedVideos);
-          if (storedVideos && storedVideos.length > 0) {
-            moodVideos = moodVideos.concat(storedVideos);
+          if (fetchedVideos && fetchedVideos.length > 0) {
+            await Videos.storeVideos(fetchedVideos);
+            moodVideos = moodVideos.concat(fetchedVideos);
           }
         }
 
-        const sortedVideos = await Videos.sortVideos(storedVideos);
+        const sortedVideos = await Videos.sortVideos(moodVideos);
         videos = [...sortedVideos];
       }
     }

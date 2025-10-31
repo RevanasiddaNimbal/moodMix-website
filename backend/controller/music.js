@@ -95,7 +95,8 @@ exports.getMusics = async (req, res, next) => {
       for (const cat of categories) {
         const result = await Musics.searchBykeywords(cat.trim().toLowerCase());
         if (result.length > 0) {
-          moodMusics.push(...result);
+          const sortedMusics = await Musics.sortMusics(result);
+          moodMusics.push(...sortedMusics);
         }
       }
       musicData = [...moodMusics];

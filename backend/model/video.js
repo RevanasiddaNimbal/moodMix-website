@@ -56,7 +56,7 @@ const videos = {
             thumbnail_default = EXCLUDED.thumbnail_default,
             thumbnail_medium = EXCLUDED.thumbnail_medium,
             live_broadcast_content = EXCLUDED.live_broadcast_content
-          RETURNING *;
+          RETURNING * ;
           `,
           [
             videoId,
@@ -132,7 +132,7 @@ const videos = {
   sortVideos: async (videos = []) => {
     try {
       const history = await pool.query(
-        `SELECT query_text, mood, hits FROM video_history ORDER BY hits DESC, last_hit_at DESC LIMIT 30;`
+        `SELECT query_text, mood, hits FROM video_history ORDER BY hits DESC, last_hit_at DESC LIMIT 10;`
       );
       const historyQuery = history.rows.map((r) => r.query_text);
 
