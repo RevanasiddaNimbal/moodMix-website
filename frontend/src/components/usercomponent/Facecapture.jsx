@@ -84,29 +84,20 @@ export default function DetectExpression({ onResult }) {
   };
   return (
     <div className={styles.container}>
-      <Webcam
-        ref={webcamref}
-        width={160}
-        height={120}
-        screenshotFormat="image/jpeg"
-        className={styles.webcamPulse}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          borderRadius: "10px",
-          border: "2px solid #fff",
-          boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-        }}
-      />
-
       <div
         className={`${styles.faceIcon} ${
           expression ? styles.faceDetected : styles.faceSearching
         }`}
       >
-        ☺️
+        <Webcam
+          ref={webcamref}
+          width={160}
+          height={120}
+          screenshotFormat="image/jpeg"
+          className={styles.webcamInCircle}
+        />
       </div>
+
       <div className={styles.status}>
         {loading
           ? "Loading models..."

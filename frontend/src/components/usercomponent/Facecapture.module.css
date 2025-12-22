@@ -110,8 +110,17 @@
   position: relative;
 }
 
-.webcamPulse {
-  animation: pulse 2s infinite;
+.webcamInCircle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 130px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 3;
 }
 
 @keyframes pulse {
