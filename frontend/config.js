@@ -1,5 +1,5 @@
 const config = {
-  API_URL: "https://moodmix.onrender.com/api",
+  API_URL: "http://localhost:5000/api",
 };
 
 export default config;

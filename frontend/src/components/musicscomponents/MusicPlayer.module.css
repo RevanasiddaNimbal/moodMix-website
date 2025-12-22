@@ -1,10 +1,10 @@
 :root {
-  --bg-color: #0f2d37; /* Dark teal background from image */
-  --card-color: transparent; /* Overlay card is transparent to the background */
+  --bg-color: #0f2d37;
+  --card-color: transparent;
   --bar-color: rgba(28, 28, 28, 0.9);
   --primary-text: #ffffff;
   --secondary-text: #b3b3b3;
-  --accent-color: #ffffff; /* White for the play button and progress */
+  --accent-color: #ffffff;
   --slider-track: rgba(255, 255, 255, 0.3);
   --slider-thumb: #ffffff;
   --shadow-color: rgba(0, 0, 0, 0.5);
@@ -13,7 +13,6 @@
   --transition-speed: 300ms;
 }
 
-/* Base body style for the background */
 body {
   background-color: var(--bg-color);
 }
@@ -36,7 +35,7 @@ body {
 
 .playButton {
   background-color: var(--accent-color);
-  color: #000000; /* Black icon for the play button */
+  color: #000000;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -61,7 +60,7 @@ body {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 4px; /* Thinner seek bar */
+  height: 4px;
   background: var(--slider-track);
   border-radius: 99px;
   outline: none;
@@ -75,24 +74,27 @@ body {
   left: 0;
   height: 100%;
   width: var(--progress, 0%);
-  background-color: var(--accent-color);
+  background-color: greenyellow;
   border-radius: 99px;
   transition: width 100ms linear;
 }
 .seekBar::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px; /* Slightly smaller thumb */
+  appearance: none;
+  width: 14px;
   height: 14px;
-  background: var(--slider-thumb);
+  background: rgba(128, 228, 92, 0.84);
   border-radius: 50%;
   cursor: pointer;
-  margin-top: -5px; /* Adjust thumb position */
   position: relative;
-  z-index: 2;
-  transition: transform 200ms ease;
+  top: 12%;
+  transform: translateY(-50%);
+  margin-top: 12px;
+  transition: transform 150ms ease;
 }
+
 .seekBar:hover::-webkit-slider-thumb {
-  transform: scale(1.1);
+  transform: translateY(-50%) scale(1.15);
 }
 .timeStamps {
   display: flex;
@@ -118,7 +120,7 @@ body {
   appearance: none;
   flex-grow: 1;
   height: 4px;
-  background: var(--slider-track);
+  background: rgb(245, 246, 244);
   border-radius: 99px;
   outline: none;
   cursor: pointer;
@@ -131,17 +133,18 @@ body {
   left: 0;
   height: 100%;
   width: var(--volume, 80%);
-  background-color: var(--primary-text);
+  background-color: rgb(162, 251, 29);
   border-radius: 99px;
 }
 .volumeSlider:hover::before {
-  background-color: var(--accent-color);
+  background-color: rgb(147, 234, 17);
 }
 .volumeSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 12px;
   height: 12px;
-  background: var(--slider-thumb);
+  background: rgb(103, 235, 80);
+  margin-top: 50px;
   border-radius: 50%;
   cursor: pointer;
   margin-top: -4px;
@@ -155,15 +158,14 @@ body {
 }
 
 .speedSelect {
-  background-color: var(--slider-track);
-  color: var(--primary-text);
+  background-color: rgba(0, 0, 0, 0.189);
+  color: rgb(245, 245, 241);
   border: none;
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 0.8rem;
 }
 
-/* --- Overlay / Expanded Player Styles --- */
 .overlay {
   position: fixed;
   top: 100%;
@@ -175,7 +177,7 @@ body {
   transition: top var(--transition-speed) ease-in-out;
   display: flex;
   flex-direction: column;
-  padding: 0 24px 24px; /* Adjust padding */
+  padding: 0 24px 24px;
 }
 .playerRoot[data-expanded="true"] .overlay {
   top: 0;
@@ -221,9 +223,9 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Allows card to fill vertical space */
-  justify-content: space-around; /* Distributes items evenly with space around them */
-  min-height: 0; /* Prevents flexbox from overflowing on very short screens */
+  flex-grow: 1;
+  justify-content: space-around;
+  min-height: 0;
 }
 .artworkWrapper {
   width: 100%;
@@ -232,7 +234,7 @@ body {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  flex-shrink: 0; /* Prevents artwork from shrinking */
+  flex-shrink: 0;
 }
 .artwork {
   position: absolute;
@@ -261,7 +263,8 @@ body {
 .trackInfo {
   text-align: left;
   flex-grow: 1;
-  min-width: 0;
+  min-width: 0; /* REQUIRED */
+  max-width: 60%;
 }
 .title {
   font-size: 1.4rem;
@@ -290,7 +293,6 @@ body {
   gap: 16px;
 }
 
-/* --- Bottom Bar Styles --- */
 .playerRoot {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
@@ -332,6 +334,7 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  max-width: 250px;
 }
 .smallTitle {
   color: var(--primary-text);
@@ -369,6 +372,7 @@ body {
 .bottomBarRight {
   display: flex;
   align-items: center;
+  justify-content: space-around;
   gap: 16px;
 }
 
@@ -379,7 +383,6 @@ body {
   display: block;
 }
 
-/* --- Breakpoint for Laptops/Desktops --- */
 @media (min-width: 1024px) {
   .mobileOnly {
     display: none;
@@ -388,7 +391,6 @@ body {
     display: flex;
   }
 
-  /* On desktop, never expand the player */
   .playerRoot[data-expanded="true"] .overlay {
     top: 100%;
   }
