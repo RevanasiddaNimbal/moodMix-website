@@ -77,15 +77,21 @@ This project is built using the **PERN Stack (PostgreSQL, Express.js, React.js, 
 ---
 
 ## 🚧 Future Enhancements
-
+```text 
 AI-generated personalized playlists
-Mood analytics dashboard
-Social sharing options
-Light/Dark theme support
-Mobile app (React Native)
-Multi-language support
-Voice-controlled navigation
 
+ Mood analytics dashboard
+
+Social sharing options
+
+Light/Dark theme support
+
+Mobile app (React Native)
+
+Multi-language support
+
+Voice-controlled navigation
+```
 ---
 
 ## 🤝 Contributing
@@ -103,6 +109,6 @@ Follow these steps:
 
 ## 👨‍💻 Author  
 **Revanasidda Nimbal**  
-Full-Stack Developer | PERN | AI Enthusiast  
+Full-Stack Developer | PERN  
 
 If you like this project, please ⭐ the repository!
