@@ -3,11 +3,15 @@ const nodemailer = require("nodemailer");
 const sendotp = async (email, otp) => {
   try {
     const transfort = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,      
+      secure: false, 
       service: "gmail",
       auth: {
         user: process.env.USER_EMAIL,
         pass: process.env.EMAIL_PASS,
       },
+        connectionTimeout: 10000,
     });
     console.log("Sending OTP to:", email);
 
