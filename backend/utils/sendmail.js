@@ -2,40 +2,33 @@ const nodemailer = require("nodemailer");
 
 const sendotp = async (email, otp) => {
   try {
-    const transfort = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,      
-      secure: false, 
-      service: "gmail",
+    const transporter = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
       auth: {
-        user: process.env.USER_EMAIL,
-        pass: process.env.EMAIL_PASS,
-      },
-        connectionTimeout: 10000,
+        user: process.env.BREVO_EMAIL,   // verified sender email
+        pass: process.env.BREVO_SMTP_KEY // SMTP key
+      }
     });
+
     console.log("Sending OTP to:", email);
 
-    let mailoption = {
-      from: process.env.USER_EMAIL,
+    const mailOptions = {
+      from: `MoodMix <${process.env.BREVO_EMAIL}>`,
       to: email,
-      subject: "Your OTP code",
-      text: `You have successfully registered to moodmix website, your otp code :${otp} please enter within 10 minutes`,
-    };
-    const info = await transfort.sendMail(mailoption);
-    console.log("Email sent:", info);
-    if (!info) {
-      console.log("Failed to send OTP to:", email);
-      return {
-        error: true,
-      };
-    }
+      subject: "Your OTP Code",
+      text: `You have successfully registered to MoodMix.
 
+Your OTP code is: ${otp}
+Valid for 10 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
     return true;
   } catch (err) {
-    console.error(err);
-    return {
-      error: true,
-    };
+    console.error("Email error:", err);
+    return { error: true };
   }
 };
 
