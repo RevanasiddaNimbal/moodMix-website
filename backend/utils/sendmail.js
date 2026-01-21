@@ -18,7 +18,9 @@ const sendotp = async (email, otp) => {
       text: `You have successfully registered to moodmix website, your otp code :${otp} please enter within 10 minutes`,
     };
     const info = await transfort.sendMail(mailoption);
+    console.log("Email sent:", info);
     if (!info) {
+      console.log("Failed to send OTP to:", email);
       return {
         error: true,
       };
@@ -26,7 +28,7 @@ const sendotp = async (email, otp) => {
 
     return true;
   } catch (err) {
-    // console.error(err.stack);
+    console.error(err);
     return {
       error: true,
     };
