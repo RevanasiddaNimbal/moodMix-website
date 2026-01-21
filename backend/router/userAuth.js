@@ -12,7 +12,6 @@ const {
   forgetpassword,
   logout,
   verify,
-  showUsers,
   refreshToken,
 } = require("../controller/auth");
 // const { verify } = require("jsonwebtoken");
@@ -26,6 +25,5 @@ router.post("/reset-password", authMiddleware, resetpassword);
 router.post("/logout", authMiddleware, logout);
 router.get("/verify", authMiddleware, verify);
 router.get("/refresh-token", refreshToken);
-router.get("/users", showUsers);
 
 module.exports = router;

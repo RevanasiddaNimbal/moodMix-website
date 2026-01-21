@@ -40,7 +40,7 @@ const User = {
     try {
       const result = await pool.query(
         "INSERT INTO users(name,email,phonenumber, password) VALUES ($1,$2,$3,$4) returning *",
-        [name, email, phonenumber, password]
+        [name, email, phonenumber, password],
       );
       if (result.rows.length === 0) {
         return { error: true };
@@ -58,7 +58,7 @@ const User = {
     try {
       const result = await pool.query(
         "UPDATE users SET is_verified=true , otp=NULL,  otp_expire_at=NULL WHERE email=$1 RETURNING *",
-        [email]
+        [email],
       );
       if (result.rows.length === 0) {
         return {
@@ -77,7 +77,7 @@ const User = {
     try {
       const updateotp = await pool.query(
         "UPDATE users SET otp=$1,otp_expire_at=$2 WHERE email=$3 returning *",
-        [otp, otp_expire_at, email]
+        [otp, otp_expire_at, email],
       );
 
       if (updateotp.rows.length === 0) {
@@ -140,7 +140,7 @@ const User = {
     try {
       const data = await pool.query(
         "UPDATE users SET password = $1 WHERE email=$2 returning *",
-        [newpassword, email]
+        [newpassword, email],
       );
       if (data.rows.length === 0) {
         return {
@@ -148,15 +148,6 @@ const User = {
         };
       }
       return data.rows[0];
-    } catch (err) {
-      return { error: true };
-    }
-  },
-
-  getUsers: async () => {
-    try {
-      const data = await pool.query("SELECT * FROM users");
-      return data.rows;
     } catch (err) {
       return { error: true };
     }

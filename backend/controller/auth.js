@@ -368,12 +368,3 @@ exports.refreshToken = async (req, res, next) => {
     next(err);
   }
 };
-
-exports.showUsers = async (req, res, next) => {
-  try {
-    const data = await User.getUsers();
-    res.status(200).json(data);
-  } catch (err) {
-    next(err);
-  }
-};
