@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/authmodel");
 const bcrypt = require("bcrypt");
-const otpMiddleware = require("../middlewares/otpService");
+const { SendOtp } = require("../utils/otpService");
 
 exports.register = async (req, res, next) => {
   try {
@@ -35,37 +35,36 @@ exports.register = async (req, res, next) => {
       });
     }
 
-    req.user = { email };
-    await otpMiddleware(req, res, async (err) => {
-      if (err) return next(err);
-      console.log("OTP for verification:");
-      const verifyToken = await jwt.sign(
-        { email: email },
-        process.env.SECRET_KEY,
-        {
-          expiresIn: "5m",
-        },
-      );
+    const verifyToken = await jwt.sign(
+      { email: email },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "5m",
+      },
+    );
 
-      res.cookie("verifytoken", verifyToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: 5 * 60 * 1000,
-      });
-
-      res.status(201).json({
-        success: true,
-        message:
-          " User registered successfully. Please verify your account using the OTP sent to your email.",
-        user: {
-          id: result.id,
-          email: result.email,
-          name: result.name,
-        },
-        verifyToken,
-      });
+    res.cookie("verifytoken", verifyToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 5 * 60 * 1000,
     });
+
+    res.status(201).json({
+      success: true,
+      message:
+        " User registered successfully. Please verify your account using the OTP sent to your email.",
+      user: {
+        id: result.id,
+        email: result.email,
+        name: result.name,
+      },
+      verifyToken,
+    });
+
+    SendOtp({ email }).catch((err) =>
+      console.log("sending otp error(register):", err),
+    );
   } catch (err) {
     next(err);
   }
@@ -77,7 +76,6 @@ exports.varifyUser = async (req, res, next) => {
     const email = req.email;
 
     const user = await User.getUserByEmail(email);
-    console.log("User fetched for OTP verification:", user.error);
     if (user.error) {
       return res.status(404).json({
         success: false,
@@ -119,11 +117,36 @@ exports.varifyUser = async (req, res, next) => {
 
 exports.resendOtp = async (req, res, next) => {
   try {
+    const email = req.email;
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: "Email is required to resend OTP.",
+      });
+    }
+    const verifyToken = await jwt.sign(
+      { email: email },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "5m",
+      },
+    );
+
+    res.cookie("verifytoken", verifyToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 5 * 60 * 1000,
+    });
     res.status(200).json({
       success: true,
       message: "OTP has been sent to your registered email.",
-      User: req.user,
+      user: req.email,
     });
+
+    SendOtp({ email }).catch((err) =>
+      console.error("OTP error (resend):", err.message),
+    );
   } catch (err) {
     next(err);
   }
@@ -134,57 +157,49 @@ exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     const result = await User.login(email, password);
 
-    if (result.user && !result.user.is_verified) {
-      req.user = { email: result.user.email };
-      await otpMiddleware(req, res, async (err) => {
-        if (err) return next(err);
-
-        const verifyToken = jwt.sign(
-          { email: result.user.email },
-          process.env.SECRET_KEY,
-          { expiresIn: "5m" },
-        );
-
-        res.cookie("verifytoken", verifyToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-          maxAge: 5 * 60 * 1000,
-        });
-
-        return res.status(403).json({
-          success: false,
-          redirect: "/verify-otp",
-          user: {
-            email: result.user.email,
-          },
-          message: "User not verified. OTP has been sent to your email.",
-        });
-      });
-
-      return;
-    }
-
-    if (result.error) {
+    if (result?.error) {
       return res.status(401).json({
         success: false,
         error: result.error,
       });
     }
+
+    if (!result.user.is_verified) {
+      SendOtp({ email }).catch((err) =>
+        console.error("OTP error (login):", err.message),
+      );
+
+      const verifyToken = await jwt.sign(
+        { email: email },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: "5m",
+        },
+      );
+
+      res.cookie("verifytoken", verifyToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 5 * 60 * 1000,
+      });
+
+      return res.status(403).json({
+        success: false,
+        redirect: "/verify-otp",
+        message: "Account not verified. OTP sent again.",
+      });
+    }
+
     const token = jwt.sign(
-      {
-        id: result.user?.id || result.id,
-        email: email,
-      },
+      { id: result.user.id, email },
       process.env.SECRET_KEY,
       { expiresIn: "2h" },
     );
 
-    const refreshToken = jwt.sign(
-      { email: result.user.email },
-      process.env.REFRESH_KEY,
-      { expiresIn: "7d" },
-    );
+    const refreshToken = jwt.sign({ email }, process.env.REFRESH_KEY, {
+      expiresIn: "7d",
+    });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -200,14 +215,13 @@ exports.login = async (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
-      message: "login successful.",
-      email: result.email,
-      name: result.name,
+      message: "Login successful",
+      email: result.user.email,
+      name: result.user.name,
     });
   } catch (err) {
-    console.log("login error: ", err.stack);
     next(err);
   }
 };
