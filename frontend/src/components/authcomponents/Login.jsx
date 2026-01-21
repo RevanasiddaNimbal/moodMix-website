@@ -30,10 +30,33 @@ export default function Login() {
       }
 
       await showMessage(data?.error || "Login failed. Try again.");
+      if (
+        data?.error.includes(
+          "No account found with this email. Please register first.",
+        )
+      ) {
+        navigate("/register");
+      }
       setloading(false);
     }
   };
-
+  const handleforgotpassword = async () => {
+    try {
+      const email = user.email;
+      if (!email) {
+        showMessage("Please enter your email to reset password.");
+        return;
+      }
+      const result = await axios.post("/auth/resend-otp", { email });
+      if (result.data?.success) {
+        showMessage(result.data?.message || "OTP sent to your email.");
+        navigate("/forgot-password");
+        return;
+      }
+    } catch (err) {
+      showMessage(err.response?.data?.error || err.message);
+    }
+  };
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -63,7 +86,7 @@ export default function Login() {
           <div className={styles.forgotPasswordWrapper}>
             <p
               className={styles.forgotPassword}
-              onClick={() => navigate("/forgot-password")}
+              onClick={() => handleforgotpassword()}
             >
               Forgot Password?
             </p>

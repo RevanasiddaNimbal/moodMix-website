@@ -30,8 +30,9 @@ export default function VerifyOtp() {
     }
 
     try {
+      console.log("Verifying OTP for email:", email);
       const res = await axios.post("/auth/verify-otp", {
-        email: user.email,
+        email: email,
         otp,
       });
 
@@ -46,7 +47,7 @@ export default function VerifyOtp() {
       console.error("OTP verify error:", err.response || err.message);
       await showMessage(
         err.response?.data?.error ||
-          "Error verifying OTP. Please try again later."
+          "Error verifying OTP. Please try again later.",
       );
       setOtp("");
     }

@@ -2,7 +2,7 @@ import axios from "axios";
 import config from "../../config";
 
 const api = axios.create({
-  baseURL: config.API_URL,
+  baseURL: "http://localhost:5000/api",
   withCredentials: true,
 });
 
@@ -23,7 +23,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

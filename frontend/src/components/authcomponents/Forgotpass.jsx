@@ -5,7 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { showMessage } from "../Message";
 
 export default function Forgotpass() {
-  const [User, setUser] = useState({ email: "", newpassword: "", confirm: "" });
+  const [User, setUser] = useState({
+    email: "",
+    newpassword: "",
+    confirm: "",
+    otp: "",
+  });
   const [showPass, setShowPass] = useState(false);
   const [showpass, setshowpass] = useState(false);
   const navigate = useNavigate();
@@ -16,7 +21,7 @@ export default function Forgotpass() {
       const res = await axios.post("/auth/forgot-password", User);
       if (res.status === 200 || res.data?.success) {
         await showMessage(
-          res.data?.message || "Password has been reset successfully."
+          res.data?.message || "Password has been reset successfully.",
         );
         navigate("/login");
       }
@@ -74,6 +79,19 @@ export default function Forgotpass() {
               onClick={() => setshowpass(!showpass)}
             ></span>
           </div>
+          <div className={styles.otpInput}>
+            <label htmlFor="otp">OTP:</label>
+            <input
+              type="text"
+              name="otp"
+              id="otp"
+              value={User.otp}
+              placeholder="Enter OTP"
+              required
+              onChange={(e) => setUser({ ...User, otp: e.target.value })}
+            />
+          </div>
+
           <button type="submit" className={styles.submitBtn}>
             submit
           </button>

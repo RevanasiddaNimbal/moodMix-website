@@ -38,13 +38,13 @@ exports.register = async (req, res, next) => {
     req.user = { email };
     await otpMiddleware(req, res, async (err) => {
       if (err) return next(err);
-
+      console.log("OTP for verification:");
       const verifyToken = await jwt.sign(
         { email: email },
         process.env.SECRET_KEY,
         {
           expiresIn: "5m",
-        }
+        },
       );
 
       res.cookie("verifytoken", verifyToken, {
@@ -77,6 +77,7 @@ exports.varifyUser = async (req, res, next) => {
     const email = req.email;
 
     const user = await User.getUserByEmail(email);
+    console.log("User fetched for OTP verification:", user.error);
     if (user.error) {
       return res.status(404).json({
         success: false,
@@ -141,7 +142,7 @@ exports.login = async (req, res, next) => {
         const verifyToken = jwt.sign(
           { email: result.user.email },
           process.env.SECRET_KEY,
-          { expiresIn: "5m" }
+          { expiresIn: "5m" },
         );
 
         res.cookie("verifytoken", verifyToken, {
@@ -176,13 +177,13 @@ exports.login = async (req, res, next) => {
         email: email,
       },
       process.env.SECRET_KEY,
-      { expiresIn: "2h" }
+      { expiresIn: "2h" },
     );
 
     const refreshToken = jwt.sign(
       { email: result.user.email },
       process.env.REFRESH_KEY,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     res.cookie("token", token, {
@@ -213,7 +214,7 @@ exports.login = async (req, res, next) => {
 
 exports.forgetpassword = async (req, res, next) => {
   try {
-    const { email, newpassword, confirm } = req.body;
+    const { email, newpassword, confirm, otp } = req.body;
 
     if (newpassword !== confirm || !email) {
       return res.status(400).json({
@@ -228,7 +229,12 @@ exports.forgetpassword = async (req, res, next) => {
         error: "User not found.",
       });
     }
-
+    if (user.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid OTP. Please enter again.",
+      });
+    }
     const hash = await bcrypt.hash(newpassword, 10);
     const updatepass = await User.resetPassword({ newpassword: hash, email });
     if (updatepass.error) {
@@ -343,7 +349,7 @@ exports.refreshToken = async (req, res, next) => {
       process.env.SECRET_KEY,
       {
         expiresIn: "2m",
-      }
+      },
     );
 
     res.cookie("token", newToken, {

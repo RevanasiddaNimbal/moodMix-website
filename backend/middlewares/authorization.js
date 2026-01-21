@@ -2,10 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const token =
-      req.header("x-verify-token") ||
-      req.cookies?.token ||
-      req.cookies?.verifytoken;
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({

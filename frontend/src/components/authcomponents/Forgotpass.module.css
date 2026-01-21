@@ -9,7 +9,8 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
     url("https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1920&q=80");
   background-repeat: no-repeat;
   background-size: cover;
@@ -60,7 +61,10 @@
   font-size: 1rem;
   outline: none;
   background: rgba(255, 255, 255, 0.9);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    0.2s ease;
 }
 
 .form input:focus {
@@ -89,7 +93,9 @@
   background-repeat: no-repeat;
   background-size: contain;
   opacity: 0.6;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .hideicon:hover {
@@ -105,6 +111,14 @@
   background-image: url("https://cdn-icons-png.flaticon.com/128/4298/4298899.png");
 }
 
+.otpInput input {
+  padding: 12px;
+  display: block;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 1rem;
+}
 .submitBtn {
   margin-top: 20px;
   padding: 12px;

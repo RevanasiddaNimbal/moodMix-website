@@ -67,7 +67,6 @@ exports.getMusics = async (req, res, next) => {
   try {
     const query = req.body?.q?.trim();
     const mood = req.body?.mood;
-    console.log("mood:", mood);
 
     await Musics.updateHistory(query, mood);
 
@@ -80,7 +79,6 @@ exports.getMusics = async (req, res, next) => {
       const categories = moodMusicMap[mood];
       const moodMusics = [];
       for (const cat of categories) {
-        console.log("Fetching musics for category:", cat);
         const result = await Musics.searchBykeywords(cat.trim().toLowerCase());
         if (result.length > 0) {
           moodMusics.push(...result);
@@ -180,7 +178,7 @@ exports.getTrackInfo = async (req, res, next) => {
       let progressiveUrl = track.progressive_url;
       if (!progressiveUrl) {
         const progressiveTrans = response.data.media.transcodings.find(
-          (t) => t.format.protocol === "progressive"
+          (t) => t.format.protocol === "progressive",
         );
 
         if (progressiveTrans) {
@@ -189,7 +187,7 @@ exports.getTrackInfo = async (req, res, next) => {
           });
           progressiveUrl = await Musics.updateProgressiveUrl(
             track.music_id,
-            transRes.data.url
+            transRes.data.url,
           );
         }
       }
