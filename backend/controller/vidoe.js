@@ -94,7 +94,7 @@ exports.getVideos = async (req, res, next) => {
       let moodVideos = [];
       for (const cat of categories) {
         const result = await Videos.searchBykeywords(
-          cat.trim().toLocaleLowerCase()
+          cat.trim().toLocaleLowerCase(),
         );
 
         if (result.length > 0) {
@@ -132,7 +132,6 @@ exports.getVideos = async (req, res, next) => {
         videos = [...sortedVideos];
       }
     }
-    console.log("Total videos fetched:", videos.length);
     if (!videos || videos.length === 0) {
       return res.status(400).json({
         success: false,
