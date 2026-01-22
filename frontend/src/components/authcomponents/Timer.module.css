@@ -7,12 +7,13 @@
 
 .timer {
   font-weight: bold;
-  color: #e63939a5;
+  color: #f360e4a5;
   margin-left: 12px;
 }
 
 .timeoff {
   font-weight: bold;
-  color: #e2d20eaa;
+  color: #4562f2c9;
   margin-left: 12px;
+  cursor: pointer;
 }

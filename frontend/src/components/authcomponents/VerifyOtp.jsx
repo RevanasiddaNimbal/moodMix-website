@@ -5,6 +5,7 @@ import Timer from "./Timer";
 import ResendOtp from "./ResendOtp";
 import styles from "./VerifyOtp.module.css";
 import { showMessage } from "../Message";
+import { useRef } from "react";
 
 export default function VerifyOtp() {
   const location = useLocation();
@@ -13,6 +14,7 @@ export default function VerifyOtp() {
   const [timer, setTimer] = useState(60);
   const [isCounting, setIsCounting] = useState(false);
   const navigate = useNavigate();
+  const verifyBtnRef = useRef(null);
 
   useEffect(() => {
     if (!email) {
@@ -63,7 +65,20 @@ export default function VerifyOtp() {
           placeholder="Enter OTP"
           name="otp"
           value={otp}
-          onChange={(e) => setOtp(e.target.value)}
+          maxLength={6}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "");
+            setOtp(value);
+
+            if (value.length === 6) {
+              verifyBtnRef.current?.classList.add(styles.glow);
+              verifyBtnRef.current?.click();
+
+              setTimeout(() => {
+                verifyBtnRef.current?.classList.remove(styles.glow);
+              }, 1500);
+            }
+          }}
           className={styles.input}
         />
 
@@ -83,7 +98,11 @@ export default function VerifyOtp() {
             setIsCounting={setIsCounting}
             className={styles.resendBtn}
           />
-          <button onClick={handleVerifyOtp} className={styles.verifyBtn}>
+          <button
+            ref={verifyBtnRef}
+            onClick={handleVerifyOtp}
+            className={styles.verifyBtn}
+          >
             Verify OTP
           </button>
         </div>
