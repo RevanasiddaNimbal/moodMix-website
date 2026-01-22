@@ -7,7 +7,7 @@ const videos = {
       if (!query && !moodValue) return;
       const result = await pool.query(
         "INSERT INTO video_history(query_text ,mood, hits, last_hit_at) VALUES ($1 , $2, 1,NOW()) ON CONFLICT (query_text , mood) DO UPDATE SET hits = video_history.hits + 1, last_hit_at = NOW() RETURNING *",
-        [query, moodValue]
+        [query, moodValue],
       );
       return result.rows[0];
     } catch (err) {
@@ -67,7 +67,7 @@ const videos = {
             thumbnails?.default?.url,
             thumbnails?.medium?.url,
             liveBroadcastContent,
-          ]
+          ],
         );
         if (result.rows.length > 0) {
           storedVideos.push(result.rows[0]);
@@ -104,7 +104,7 @@ const videos = {
            v.published_at DESC
          LIMIT 50;
  `,
-        [query.trim().toLowerCase(), moodValue?.trim() || null]
+        [query.trim().toLowerCase(), moodValue?.trim() || null],
       );
       if (result.rows.length > 0) {
         allvideos.push(...result.rows);
@@ -132,7 +132,7 @@ const videos = {
   sortVideos: async (videos = []) => {
     try {
       const history = await pool.query(
-        `SELECT query_text, mood, hits FROM video_history ORDER BY hits DESC, last_hit_at DESC LIMIT 10;`
+        `SELECT query_text, mood, hits FROM video_history ORDER BY hits DESC, last_hit_at DESC LIMIT 10;`,
       );
       const historyQuery = history.rows.map((r) => r.query_text);
 
@@ -150,7 +150,7 @@ const videos = {
           ORDER BY vh.hits DESC, v.published_at DESC
           LIMIT 50;
           `,
-          [query]
+          [query],
         );
         if (result.rows.length > 0) {
           his_videos.push(...result.rows);
@@ -161,7 +161,7 @@ const videos = {
       if (allResults.length === 0) {
         console.log("fetching fallback videos");
         const fallback = await pool.query(
-          `SELECT * FROM videos ORDER BY updated_at DESC LIMIT 50`
+          `SELECT * FROM videos ORDER BY updated_at DESC LIMIT 50`,
         );
         allResults = fallback.rows;
       }

@@ -3,46 +3,43 @@ const Musics = require("../model/music");
 
 const moodMusicMap = {
   happy: [
-    "Pharrell Williams - Happy (English)",
-    "Arijit Singh - Nashe Si Chadh Gayi (Hindi)",
-    "Rajesh Krishnan - Priya Priya (Kannada)",
-    "Dhanush - Rowdy Baby (Tamil)",
-    "Sid Sriram - Samajavaragamana (Telugu)",
+    "positive inspirational music full length",
+    "uplifting multilingual songs compilation full album",
+    "feel good instrumental background music full",
+    "light classical music for positive mood full length",
+    "motivational music playlist full session",
   ],
 
   sad: [
-    "Adele - Someone Like You (English)",
-    "Arijit Singh - Tum Hi Ho (Hindi)",
-    "Rajesh Krishnan - Hrudaya Geethe (Kannada)",
-    "Ilaiyaraaja - En Iniya Pon Nilave (Tamil)",
-    "Sid Sriram - Maate Vinadhuga (Telugu)",
-    "K.S. Chithra - Oru Naal (Malayalam)",
+    "emotional instrumental music full album",
+    "soft melody songs compilation full length",
+    "reflective music for deep thinking full session",
+    "emotional classical music full length",
+    "calm expressive instrumental playlist full",
   ],
 
   calm: [
-    "Sunil T J -kannada songs Melody",
-    "feeling songs kannada ",
-    "Minnalvala  Radio kannada songs ",
-    "harish_murthy - Kannada Songs ",
-    "Jack Johnson - Better Together (English)",
+    "peaceful instrumental music full album",
+    "relaxing classical flute and piano full length",
+    "meditation and mindfulness music full session",
+    "nature ambient music for calmness full",
+    "soft background music for relaxation full length",
   ],
 
   angry: [
-    "Rage Against the Machine - Killing in the Name (English)",
-    "Gully Boy - Apna Time Aayega (Hindi)",
-    "Bajrang Dal - Fight Song (Kannada)",
-    "Sid Sriram - Verithanam (Tamil)",
-    "Sid Sriram - Aathadi (Telugu)",
-    "Linkin Park - One Step Closer (English)",
+    "stress relief instrumental music full album",
+    "calming background music for emotional balance full",
+    "focus and concentration music full session",
+    "motivational instrumental music full length",
+    "mental clarity music playlist full",
   ],
 
   excited: [
-    "Queen - Don't Stop Me Now (English)",
-    "Arijit Singh - Ghungroo (Hindi)",
-    "Kaviraj & Vijay Prakash - Banna Bannada Loka (Kannada)",
-    "Dhanush - Rowdy Baby (Tamil)",
-    "Anirudh - Surviva (Telugu)",
-    "Yo Yo Honey Singh - Desi Kalakaar (Hindi)",
+    "energetic instrumental music full album",
+    "motivational background music full session",
+    "uplifting instrumental playlist full length",
+    "positive energy music compilation full",
+    "inspirational instrumental music full program",
   ],
 };
 

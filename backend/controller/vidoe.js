@@ -3,43 +3,43 @@ const Videos = require("../model/video");
 
 const moodVedeosMap = {
   happy: [
-    "best feel-good kannada songs full video",
-    "funny comedy movie scenes full",
-    "joyful music video mix 2025 full length",
-    "upbeat dance hits collection 2025 full songs",
-    "heartwarming friendship short film full length",
+    "positive kannada inspirational songs full length",
+    "uplifting instrumental music full album",
+    "motivational documentary on positive mindset full",
+    "light classical music compilation full length",
+    "inspiring human achievement documentary full",
   ],
 
   sad: [
-    "emotional kannada love songs jukebox",
-    "sad melody songs collection full album",
-    "heart-touching breakup story short film full",
-    "painful romantic movie scenes full length",
-    "melancholy acoustic cover performances full video",
+    "emotional classical instrumental music full album",
+    "soft reflective music compilation full length",
+    "motivational lecture on overcoming challenges full session",
+    "life lessons documentary full length",
+    "reflective poetry narration full program",
   ],
 
   calm: [
-    "peaceful nature background video with soft music full",
-    "deep sleep meditation music 2 hours non stop",
-    "rain sounds with lo-fi chill beats full playlist",
-    "calm piano and flute instrumentals full album",
-    "relaxing morning yoga music 1 hour",
+    "guided mindfulness meditation full session",
+    "soft instrumental relaxation music full album",
+    "nature documentary with ambient sound full length",
+    "classical flute and piano music full album",
+    "yoga and breathing exercises full session",
   ],
 
   angry: [
-    "high energy rock and metal live performance full concert",
-    "powerful workout motivation mix full",
-    "aggressive rap cypher full session",
-    "motivational movie scenes hindi dubbed full length",
-    "epic action background score cinematic playlist full",
+    "stress management lecture full session",
+    "emotional regulation techniques seminar full",
+    "discipline and self improvement documentary full length",
+    "focus enhancing instrumental background music full album",
+    "mental resilience educational talk full session",
   ],
 
   excited: [
-    "party dance mix 2025 non stop full songs",
-    "latest kannada mass songs jukebox full",
-    "festival celebration music videos full length",
-    "energetic edm mix 2025 full dj set",
-    "adventure travel vlogs cinematic full video",
+    "motivational success stories documentary full length",
+    "innovation and technology documentary full program",
+    "inspirational leadership speech full session",
+    "educational travel documentary full length",
+    "career growth and self development lecture full",
   ],
 };
 
