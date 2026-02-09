@@ -36,7 +36,7 @@ exports.register = async (req, res, next) => {
     }
 
     const verifyToken = await jwt.sign(
-      { email: email },
+      { id: result.id, email: email },
       process.env.SECRET_KEY,
       {
         expiresIn: "5m",
@@ -118,6 +118,7 @@ exports.varifyUser = async (req, res, next) => {
 exports.resendOtp = async (req, res, next) => {
   try {
     const email = req.email;
+    const id = req.id;
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -125,7 +126,7 @@ exports.resendOtp = async (req, res, next) => {
       });
     }
     const verifyToken = await jwt.sign(
-      { email: email },
+      { id: id, email: email },
       process.env.SECRET_KEY,
       {
         expiresIn: "5m",
@@ -170,7 +171,7 @@ exports.login = async (req, res, next) => {
       );
 
       const verifyToken = await jwt.sign(
-        { email: email },
+        { id: result.user.id, email: email },
         process.env.SECRET_KEY,
         {
           expiresIn: "5m",
@@ -197,9 +198,13 @@ exports.login = async (req, res, next) => {
       { expiresIn: "2h" },
     );
 
-    const refreshToken = jwt.sign({ email }, process.env.REFRESH_KEY, {
-      expiresIn: "7d",
-    });
+    const refreshToken = jwt.sign(
+      { id: result.user.id, email },
+      process.env.REFRESH_KEY,
+      {
+        expiresIn: "7d",
+      },
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -358,6 +363,7 @@ exports.refreshToken = async (req, res, next) => {
     }
     const newToken = jwt.sign(
       {
+        id: decode.id,
         email: decode.email,
       },
       process.env.SECRET_KEY,

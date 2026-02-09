@@ -12,6 +12,7 @@ const authMiddleware = async (req, res, next) => {
 
     const decode = jwt.verify(token, process.env.SECRET_KEY);
     req.email = decode.email;
+    req.id = decode.id;
 
     next();
   } catch (err) {

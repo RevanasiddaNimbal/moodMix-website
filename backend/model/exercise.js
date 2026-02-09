@@ -7,13 +7,19 @@ const exercises = {
       .toLowerCase();
   },
 
-  updateHistory: async (query, moodValue) => {
+  updateHistory: async (userId, query, moodValue) => {
     try {
       if (!query && !moodValue) return;
 
       const result = await pool.query(
-        "INSERT INTO search_history(query_text , mood, hits,last_hit_at) VALUES ($1,$2, 1,NOW()) ON CONFLICT (query_text,mood) DO UPDATE SET hits = search_history.hits + 1, last_hit_at = NOW() RETURNING *",
-        [query, moodValue]
+        `INSERT INTO search_history(user_id, query_text, mood, hits, last_hit_at)
+         VALUES ($1, $2, $3, 1, NOW())
+         ON CONFLICT (user_id, query_text, mood)
+         DO UPDATE SET
+           hits = search_history.hits + 1,
+           last_hit_at = NOW()
+         RETURNING *`,
+        [userId, query, moodValue],
       );
       return result.rows[0];
     } catch (err) {
@@ -29,7 +35,7 @@ const exercises = {
       if (!exercisesArray || exercisesArray.length === 0) return [];
       const storedExercises = [];
 
-      for (const exercise of exercisesArray) {
+      const promises = exercisesArray.map(async (exercise) => {
         const {
           id: external_id,
           name,
@@ -59,20 +65,20 @@ const exercises = {
             equipmentNorm,
             instructions ? `{${instructions.join(",")}}` : null,
             category || null,
-          ]
+          ],
         );
-        if (result.rows.length > 0) {
-          storedExercises.push(result.rows[0]);
-        }
-      }
-      return storedExercises;
+        return result.rows[0];
+      });
+      const results = await Promise.all(promises);
+
+      return (storedExercises = results.filter(Boolean));
     } catch (err) {
       console.log("Error storing exercise:", err.message);
       return [];
     }
   },
 
-  searchBykeywords: async (query = "", moodValue = null) => {
+  searchBykeywords: async (userId, query = "", moodValue = null) => {
     try {
       if (!query && !moodValue) return [];
 
@@ -86,8 +92,8 @@ const exercises = {
 
       let allResults = [];
 
-      for (const word of keywords) {
-        if (!word) continue;
+      const promises = keywords.map(async (word) => {
+        if (!word) return;
         const result = await pool.query(
           `
         SELECT 
@@ -96,10 +102,13 @@ const exercises = {
           sh.mood AS matched_mood
         FROM exercises e
         LEFT JOIN search_history sh
-          ON (LOWER(sh.query_text) = LOWER($1)
+          ON (
+              LOWER(sh.query_text) = LOWER($1)
               OR LOWER(e.name) LIKE '%' || LOWER(sh.query_text) || '%'
-              OR LOWER(e.target) LIKE '%' || LOWER(sh.query_text) || '%')
+              OR LOWER(e.target) LIKE '%' || LOWER(sh.query_text) || '%'
+             )
          AND ($2::VARCHAR IS NULL OR sh.mood = $2::VARCHAR)
+         AND sh.user_id = $3
         WHERE 
           (e.name ILIKE '%' || $1 || '%' 
           OR e.target ILIKE '%' || $1 || '%' 
@@ -110,12 +119,12 @@ const exercises = {
           e.name ASC
         LIMIT 50
         `,
-          [word, moodValue]
+          [word, moodValue, userId],
         );
-        if (result.rows.length > 0) {
-          allResults = allResults.concat(result.rows);
-        }
-      }
+        return result.rows;
+      });
+      const results = await Promise.all(promises);
+      allResults = results.flat();
 
       const finalResults = allResults.sort((a, b) => {
         if (b.search_hits !== a.search_hits)
@@ -134,39 +143,41 @@ const exercises = {
     }
   },
 
-  sortExercises: async (exercises = []) => {
+  sortExercises: async (userId, exercises = []) => {
     try {
       const historyRes = await pool.query(
         `SELECT query_text, mood, hits 
        FROM search_history 
+        WHERE user_id = $1
        ORDER BY hits DESC, last_hit_at DESC 
-       LIMIT 20;`
+       LIMIT 20;`,
+        [userId],
       );
 
       const historyQueries = historyRes.rows.map((r) => r.query_text);
 
       let his_exercises = [];
-      for (const query of historyQueries) {
+      const promises = historyQueries.map(async (query) => {
         const result = await pool.query(
           `SELECT e.*, COALESCE(sh.hits, 0) AS search_hits
-       FROM exercises e
-       LEFT JOIN search_history sh
-         ON LOWER(e.name) LIKE '%' || LOWER(sh.query_text) || '%'
-       WHERE LOWER(e.name) LIKE '%' || LOWER($1) || '%'
-       ORDER BY sh.hits DESC, e.updated_at DESC
-       LIMIT 50`,
-          [query]
+           FROM exercises e
+           LEFT JOIN search_history sh
+             ON LOWER(e.name) LIKE '%' || LOWER(sh.query_text) || '%'
+            AND sh.user_id = $2
+           WHERE LOWER(e.name) LIKE '%' || LOWER($1) || '%'
+           ORDER BY sh.hits DESC, e.updated_at DESC
+           LIMIT 50`,
+          [query, userId],
         );
-        if (result.rows.length > 0) {
-          his_exercises.push(...result.rows);
-        }
-      }
-
+        return result.rows;
+      });
+      const results = await Promise.all(promises);
+      his_exercises = results.flat();
       let allResults = [...his_exercises, ...exercises];
 
       if (allResults.length === 0) {
         const fallback = await pool.query(
-          `SELECT * FROM exercises ORDER BY updated_at DESC LIMIT 100`
+          `SELECT * FROM exercises ORDER BY updated_at DESC LIMIT 100`,
         );
         allResults = fallback.rows;
       }
@@ -179,6 +190,7 @@ const exercises = {
 
         return (b.search_hits || 0) - (a.search_hits || 0);
       });
+
       return finalResults;
     } catch (err) {
       console.log("Error fetching updated exercises:", err.message);
@@ -192,7 +204,7 @@ const exercises = {
 
       const result = await pool.query(
         `UPDATE exercises SET gif_url = $1 WHERE id = $2 RETURNING *`,
-        [gifUrl, Id]
+        [gifUrl, Id],
       );
 
       if (result.rows.length === 0) return false;
@@ -209,7 +221,7 @@ const exercises = {
 
       const result = await pool.query(
         `SELECT gif_url, external_id FROM exercises WHERE id = $1`,
-        [exerciseId]
+        [exerciseId],
       );
 
       if (result.rows.length === 0) return null;

@@ -6,6 +6,7 @@ const verifyOtpMiddleware = (req, res, next) => {
     if (token) {
       const decoded = jwt.verify(token, process.env.SECRET_KEY);
       req.email = decoded.email;
+      req.id = decoded.id;
     } else {
       const email = req.body?.email;
       if (!email) {
@@ -15,6 +16,7 @@ const verifyOtpMiddleware = (req, res, next) => {
         });
       }
       req.email = email;
+      req.id = null;
     }
     next();
   } catch (err) {

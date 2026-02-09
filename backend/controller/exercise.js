@@ -10,10 +10,10 @@ const moodMap = {
   excited: ["quads", "pectorals", "lats"],
 };
 
+// Helper function to fetch exercises from external API
 const fetchExercises = async (endpoint) => {
   try {
     const response = await exerciseAPI.get(`/exercises${endpoint}`);
-    console.log("request sent : ", endpoint);
     return response.data;
   } catch (err) {
     console.error("Error fetching exercises:", err.message);
@@ -21,44 +21,62 @@ const fetchExercises = async (endpoint) => {
   }
 };
 
+// Helper function to get exercises based on categories
+const getExercises = async (categories, userId) => {
+  try {
+    const promises = categories.map(async (cat) => {
+      return await Exercise.searchBykeywords(userId, Exercise.normalize(cat));
+    });
+
+    const results = await Promise.all(promises);
+    const allExercises = results.flat();
+    const exercises = await Exercise.sortExercises(userId, allExercises);
+    return exercises;
+  } catch (err) {
+    console.error("Error fetching exercises:", err.message);
+    return [];
+  }
+};
+
+// Helper function to get unique exercises based on external_id
+const getUniqueExercises = (exercises) => {
+  const uniqueExercises = Object.values(
+    exercises.reduce((acc, ex) => {
+      acc[ex.external_id] = ex;
+      return acc;
+    }, {}),
+  );
+  return uniqueExercises;
+};
+
 exports.getExercises = async (req, res) => {
   try {
     const query = Exercise.normalize(req.query.q);
     const moodValue = Exercise.normalize(req.query.mood);
+    const userId = req.id;
 
     let exercises = [];
 
-    await Exercise.updateHistory(query, moodValue);
+    Exercise.updateHistory(userId, query, moodValue).catch((err) =>
+      console.error("History update failed:", err),
+    );
 
-    exercises = query ? await Exercise.searchBykeywords(query) : [];
+    exercises = query
+      ? await Exercise.searchBykeywords(userId, query, moodValue)
+      : [];
     if (exercises.length !== 0) {
-      exercises = await Exercise.sortExercises(exercises);
+      exercises = await Exercise.sortExercises(userId, exercises);
     }
 
     if (!query && moodValue) {
       const categories = moodMap[moodValue];
-      let moodExercises = [];
-
-      for (const cat of categories) {
-        const data = await Exercise.searchBykeywords(Exercise.normalize(cat));
-        if (data && data.length > 0) {
-          moodExercises = moodExercises.concat(data);
-        }
-      }
-
+      let moodExercises = await getExercises(categories, userId);
       exercises = [...moodExercises];
     }
 
     if (!query && !moodValue) {
       const categories = moodMap["happy"];
-      let moodExercises = [];
-
-      for (const cat of categories) {
-        const data = await Exercise.searchBykeywords(Exercise.normalize(cat));
-        if (data && data.length > 0) {
-          moodExercises = moodExercises.concat(data);
-        }
-      }
+      let moodExercises = await getExercises(categories, userId);
       exercises = [...moodExercises];
     }
 
@@ -66,25 +84,24 @@ exports.getExercises = async (req, res) => {
       if (query) {
         const result = await fetchExercises(`/name/${query}`);
         const exerciseData = await Exercise.storeExercises(result);
-        const sortedExercises = await Exercise.sortExercises(exerciseData);
+        const sortedExercises = await Exercise.sortExercises(
+          userId,
+          exerciseData,
+        );
 
         exercises = [...sortedExercises];
       } else {
         const categories = moodMap[moodValue] || moodMap["happy"];
         let exerciseData = [];
 
-        for (const cat of categories.slice(0, 2)) {
-          const result = await fetchExercises(
-            `/target/${encodeURIComponent(cat)}`
-          );
+        const promises = categories.map((cat) =>
+          fetchExercises(`/target/${encodeURIComponent(cat)}`),
+        );
+        const results = await Promise.all(promises);
 
-          if (result && result.length > 0) {
-            exerciseData = await Exercise.storeExercises(result);
-            const sortedData = await Exercise.sortExercises(exerciseData);
-
-            exerciseData = [...exerciseData, ...sortedData];
-          }
-        }
+        const allExercises = results.flat();
+        const uniqueExercises = getUniqueExercises(allExercises);
+        exerciseData = await Exercise.storeExercises(uniqueExercises);
         exercises = [...exerciseData];
       }
     }
@@ -96,12 +113,9 @@ exports.getExercises = async (req, res) => {
       });
     }
 
-    const uniqueExercises = {};
-    for (const exercise of exercises) {
-      uniqueExercises[exercise.external_id] = exercise;
-    }
+    const uniqueExercises = getUniqueExercises(exercises);
 
-    res.status(200).json(Object.values(uniqueExercises));
+    res.status(200).json(uniqueExercises);
   } catch (err) {
     console.error("Error fetching exercises:", err);
     res
@@ -143,24 +157,19 @@ exports.getImage = async (req, res) => {
     const fileBuffer = Buffer.from(imageResponse.data);
     const fileName = `exercise_${id}-${Date.now()}.gif`;
 
-    const { data, error } = await supabase.storage
+    const uploadPromise = supabase.storage
       .from("moodMix")
       .upload(fileName, fileBuffer, {
         contentType: "image/gif",
       });
 
-    if (error) {
-      console.log("Supabase upload error:", error.message);
-      return res.status(500).json({
-        success: false,
-        error: "Failed to upload image.",
-      });
-    }
-    const { data: urlData } = supabase.storage
-      .from("moodMix")
-      .getPublicUrl(fileName);
+    publicUrl = supabase.storage.from("moodMix").getPublicUrl(fileName)
+      .data.publicUrl;
 
-    publicUrl = await Exercise.updateGifUrl(id, urlData.publicUrl);
+    uploadPromise.then(({ data, error }) => {
+      if (!error) Exercise.updateGifUrl(id, publicUrl);
+    });
+
     res.status(200).json({ success: true, url: publicUrl });
   } catch (error) {
     console.error("Error in image proxy:", error.message);

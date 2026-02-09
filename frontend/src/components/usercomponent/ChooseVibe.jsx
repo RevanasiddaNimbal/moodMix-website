@@ -6,11 +6,11 @@ export default function ChooseVibe() {
   const navigate = useNavigate();
   const location = useLocation();
   let mood = location.state?.mood || "";
-  const value = location.state?.value || "";
-  if (mood == "neutral" && value > 90) {
+  const value = Number(location.state?.value || 0);
+  if (mood == "neutral" && value > 0.9) {
     mood = "happy";
-  } else if (!mood && value < 90) {
-    mood = "clam";
+  } else if (!mood || value < 0.9) {
+    mood = "calm";
   }
 
   return (

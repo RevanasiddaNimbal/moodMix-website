@@ -23,6 +23,21 @@ export default function ExerciseList() {
           params: { q: query, mood },
         });
         setExercises(res.data || []);
+
+        const imagePromises = res.data.map((ex) =>
+          musicAPI.get(`/exercise-image?id=${ex.id}`).then(
+            (res) => ({ id: ex.id, url: res.data.url }),
+            (err) => ({
+              id: ex.id,
+              url: "https://placehold.co/1000x900?text=No+Image",
+            }),
+          ),
+        );
+
+        const results = await Promise.all(imagePromises);
+        const newImages = {};
+        results.forEach((item) => (newImages[item.id] = item.url));
+        setImages(newImages);
       } catch (err) {
         console.error("Error fetching exercises:", err.message);
         setExercises([]);
@@ -30,36 +45,8 @@ export default function ExerciseList() {
         setLoading(false);
       }
     };
-
     fetchExercises();
   }, [query, mood]);
-
-  useEffect(() => {
-    const fetchImages = async () => {
-      const promises = exercises.map(async (exercise) => {
-        try {
-          const res = await musicAPI.get(`/exercise-image?id=${exercise.id}`);
-          return { id: exercise.id, url: res.data.url };
-        } catch (err) {
-          console.error("Error loading image:", err.message);
-          return {
-            id: exercise.id,
-            url: "https://placehold.co/1000x900?text=No+Image+Available",
-          };
-        }
-      });
-
-      const results = await Promise.all(promises);
-      const newImages = {};
-      results.forEach((item) => {
-        newImages[item.id] = item.url;
-      });
-
-      setImages(newImages);
-    };
-
-    if (exercises.length > 0) fetchImages();
-  }, [exercises]);
 
   if (loading) return <LoadingComponent />;
 
