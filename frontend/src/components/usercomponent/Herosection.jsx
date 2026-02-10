@@ -10,7 +10,9 @@ export default function HeroSection() {
 
   useEffect(() => {
     axios
-      .get("/auth/verify")
+      .get("/auth/verify", {
+        withCredentials: true,
+      })
       .then((res) => {
         if (res.data.success) {
           setIsAuthed(true);

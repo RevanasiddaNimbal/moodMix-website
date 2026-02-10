@@ -22,7 +22,7 @@ const fetchExercises = async (endpoint) => {
 };
 
 // Helper function to get exercises based on categories
-const getExercises = async (categories, userId) => {
+const getExercisesByCategories = async (categories, userId) => {
   try {
     const promises = categories.map(async (cat) => {
       return await Exercise.searchBykeywords(userId, Exercise.normalize(cat));
@@ -70,13 +70,13 @@ exports.getExercises = async (req, res) => {
 
     if (!query && moodValue) {
       const categories = moodMap[moodValue];
-      let moodExercises = await getExercises(categories, userId);
+      let moodExercises = await getExercisesByCategories(categories, userId);
       exercises = [...moodExercises];
     }
 
     if (!query && !moodValue) {
       const categories = moodMap["happy"];
-      let moodExercises = await getExercises(categories, userId);
+      let moodExercises = await getExercisesByCategories(categories, userId);
       exercises = [...moodExercises];
     }
 

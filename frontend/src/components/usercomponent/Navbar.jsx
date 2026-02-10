@@ -14,7 +14,9 @@ export default function Navbar() {
 
   useEffect(() => {
     axios
-      .get("/auth/verify")
+      .get("/auth/verify", {
+        withCredentials: true,
+      })
       .then((res) => {
         if (res.data.success) {
           setIsAuthed(true);

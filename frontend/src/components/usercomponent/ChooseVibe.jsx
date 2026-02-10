@@ -7,9 +7,10 @@ export default function ChooseVibe() {
   const location = useLocation();
   let mood = location.state?.mood || "";
   const value = Number(location.state?.value || 0);
+  console.log("Received mood and value:", mood, value);
   if (mood == "neutral" && value > 0.9) {
     mood = "happy";
-  } else if (!mood || value < 0.9) {
+  } else if (!mood) {
     mood = "calm";
   }
 
