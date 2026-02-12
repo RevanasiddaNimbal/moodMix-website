@@ -140,7 +140,7 @@ export default function MusicPlayer({ currentSong = {}, onNext, onPrev }) {
           <div className={styles.artworkWrapper}>
             <img
               src={
-                currentSong.artwork_url ||
+                currentSong.artwork ||
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAcnaFZe1pPB88jr2oxD4ob7z2SUT39bazVg&s"
               }
               alt={currentSong.title || "Album Art"}
@@ -237,7 +237,7 @@ export default function MusicPlayer({ currentSong = {}, onNext, onPrev }) {
         <div className={styles.bottomBarLeft}>
           <img
             src={
-              currentSong.artwork_url ||
+              currentSong.artwork ||
               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAcnaFZe1pPB88jr2oxD4ob7z2SUT39bazVg&s"
             }
             alt=""

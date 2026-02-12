@@ -40,23 +40,7 @@ export default function Login() {
       setloading(false);
     }
   };
-  const handleforgotpassword = async () => {
-    try {
-      const email = user.email;
-      if (!email) {
-        showMessage("Please enter your email to reset password.");
-        return;
-      }
-      const result = await axios.post("/auth/resend-otp", { email });
-      if (result.data?.success) {
-        showMessage(result.data?.message || "OTP sent to your email.");
-        navigate("/forgot-password");
-        return;
-      }
-    } catch (err) {
-      showMessage(err.response?.data?.error || err.message);
-    }
-  };
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -86,7 +70,7 @@ export default function Login() {
           <div className={styles.forgotPasswordWrapper}>
             <p
               className={styles.forgotPassword}
-              onClick={() => handleforgotpassword()}
+              onClick={() => navigate("/forgot-password")}
             >
               Forgot Password?
             </p>

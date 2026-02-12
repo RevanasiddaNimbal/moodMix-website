@@ -29,6 +29,12 @@ exports.register = async (req, res, next) => {
       password: hashpassword,
     });
     if (result.error) {
+      if (result.message && result.message.includes("users_phonenumber_key")) {
+        return res.status(409).json({
+          success: false,
+          error: "Phone number is already registered.",
+        });
+      }
       return res.status(500).json({
         success: false,
         error: "Failed to register user. Please try again.",

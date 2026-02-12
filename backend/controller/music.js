@@ -58,13 +58,14 @@ exports.getMusics = async (req, res, next) => {
 
     const feed = [...newSongsList, ...oldSongs];
 
-    const uniqueFeed = Object.values(
-      feed.reduce((acc, song) => {
-        acc[song.music_id] = song;
-        return acc;
-      }, {}),
-    );
+    const uniqueFeed = [...new Map(feed.map((m) => [m.music_id, m])).values()];
 
+    if (!uniqueFeed || uniqueFeed.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No musics found. Please try again later.",
+      });
+    }
     res.status(200).json({
       success: true,
       data: uniqueFeed,

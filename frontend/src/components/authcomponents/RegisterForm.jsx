@@ -23,6 +23,18 @@ export default function RegisterForm() {
     e.preventDefault();
     setloading(true);
 
+    if (!/^\d{10}$/.test(user.phonenumber)) {
+      await showMessage("Phone number must be exactly 10 digits.");
+      setloading(false);
+      return;
+    }
+
+    if (user.password.length < 6) {
+      await showMessage("Password must be at least 6 characters long.");
+      setloading(false);
+      return;
+    }
+
     try {
       const res = await axios.post("/auth/register", user);
       if (res.status === 201 || res.data.success) {
@@ -34,7 +46,7 @@ export default function RegisterForm() {
     } catch (err) {
       console.error(err);
       await showMessage(
-        err.response?.data?.error || "Failed to register. Try again."
+        err.response?.data?.error || "Failed to register. Try again.",
       );
     }
     setloading(false);

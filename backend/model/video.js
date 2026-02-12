@@ -1,35 +1,41 @@
 const pool = require("../config/db");
 
 const videos = {
-  updateHistory: async (query = "", moodValue = "") => {
-    console.log("Updating video history with:", query, moodValue);
+  updateHistory: async (userId, query = "", moodValue = "") => {
     try {
-      if (!query && !moodValue) return;
+      if (!query && !moodValue) return null;
+
       const result = await pool.query(
-        "INSERT INTO video_history(query_text ,mood, hits, last_hit_at) VALUES ($1 , $2, 1,NOW()) ON CONFLICT (query_text , mood) DO UPDATE SET hits = video_history.hits + 1, last_hit_at = NOW() RETURNING *",
-        [query, moodValue],
+        `
+        INSERT INTO video_history (user_id, query_text, mood, hits, last_hit_at)
+        VALUES ($1, $2, $3, 1, NOW())
+        ON CONFLICT (user_id, query_text, mood)
+        DO UPDATE SET
+          hits = video_history.hits + 1,
+          last_hit_at = NOW()
+        RETURNING *
+        `,
+        [userId, query.toLowerCase(), moodValue],
       );
+
       return result.rows[0];
     } catch (err) {
-      console.log("Error updating video history:", err.message);
-      return {
-        error: true,
-      };
+      console.error("updateHistory error:", err.message);
+      return null;
     }
   },
 
   storeVideos: async (videoArray = []) => {
     try {
       if (!videoArray || videoArray.length === 0) return [];
-      const storedVideos = [];
 
-      for (const video of videoArray) {
+      const promises = videoArray.map(async (video) => {
         const {
           id: { videoId },
           snippet,
         } = video;
 
-        if (!videoId || !snippet) continue;
+        if (!videoId || !snippet) return null;
 
         const {
           title,
@@ -55,8 +61,9 @@ const videos = {
             published_at = EXCLUDED.published_at,
             thumbnail_default = EXCLUDED.thumbnail_default,
             thumbnail_medium = EXCLUDED.thumbnail_medium,
-            live_broadcast_content = EXCLUDED.live_broadcast_content
-          RETURNING * ;
+            live_broadcast_content = EXCLUDED.live_broadcast_content,
+            updated_at = NOW()
+          RETURNING *
           `,
           [
             videoId,
@@ -69,117 +76,107 @@ const videos = {
             liveBroadcastContent,
           ],
         );
-        if (result.rows.length > 0) {
-          storedVideos.push(result.rows[0]);
-        }
-      }
-      return storedVideos;
+
+        return result.rows[0] ?? null;
+      });
+
+      const results = await Promise.all(promises);
+      return results.filter(Boolean);
     } catch (err) {
-      console.log("Error storing videos:", err.message);
+      console.error("storeVideos error:", err.message);
       return [];
     }
   },
 
-  searchBykeywords: async (query, moodValue) => {
+  searchBykeywords: async (userId, query, moodValue) => {
     try {
-      let allvideos = [];
+      if (!query) return [];
 
       const result = await pool.query(
         `
-          SELECT 
-           v.*,
-           COALESCE(vh.hits, 0) AS search_hits,
-           vh.mood AS matched_mood
-         FROM videos v
-         LEFT JOIN video_history vh
-           ON LOWER(vh.query_text) = LOWER($1)
-           AND ($2::VARCHAR IS NULL OR vh.mood = $2::VARCHAR)
-         WHERE (
-           v.title ILIKE '%' || $1 || '%'
-           OR v.description ILIKE '%' || $1 || '%'
-           OR v.channel_title ILIKE '%' || $1 || '%'
-         )
-         ORDER BY 
-           COALESCE(vh.hits, 0) DESC,
-           v.published_at DESC
-         LIMIT 50;
- `,
-        [query.trim().toLowerCase(), moodValue?.trim() || null],
+        SELECT
+          v.*,
+          COALESCE(vh.hits, 0) AS search_hits,
+          vh.mood AS matched_mood,
+          (
+            COALESCE(vh.hits, 0) * 5
+            + CASE WHEN vh.mood = $3 THEN 3 ELSE 0 END
+            + CASE WHEN v.published_at > NOW() - INTERVAL '7 days' THEN 2 ELSE 0 END
+            + CASE WHEN LOWER(v.title) ILIKE '%' || $2 || '%' THEN 4 ELSE 0 END
+            + CASE WHEN LOWER(v.channel_title) ILIKE '%' || $2 || '%' THEN 2 ELSE 0 END
+            + CASE WHEN LOWER(v.description) ILIKE '%' || $2 || '%' THEN 1 ELSE 0 END
+          ) AS rank_score
+        FROM videos v
+        LEFT JOIN video_history vh
+          ON vh.user_id = $1
+          AND LOWER(vh.query_text) = $2
+          AND ($3::VARCHAR IS NULL OR vh.mood = $3::VARCHAR)
+        WHERE (
+          v.title ILIKE '%' || $2 || '%'
+          OR v.description ILIKE '%' || $2 || '%'
+          OR v.channel_title ILIKE '%' || $2 || '%'
+        )
+        ORDER BY rank_score DESC, v.published_at DESC
+        LIMIT 50
+        `,
+        [userId, query.trim().toLowerCase(), moodValue?.trim() || null],
       );
-      if (result.rows.length > 0) {
-        allvideos.push(...result.rows);
-      }
 
-      const uniqueVideos = {};
-      for (const video of allvideos) {
-        uniqueVideos[video.video_id] = video;
-      }
-      const finalResults = Object.values(uniqueVideos).sort((a, b) => {
-        if (b.search_hits !== a.search_hits)
-          return b.search_hits - a.search_hits;
-        if (a.matched_mood === moodValue && b.matched_mood !== moodValue)
-          return -1;
-        if (b.matched_mood === moodValue && a.matched_mood !== moodValue)
-          return 1;
-        return a.title.localeCompare(b.title);
-      });
-      return finalResults;
+      return result.rows;
     } catch (err) {
-      console.log("searching error: ", err.message);
+      console.error("searchBykeywords error:", err.message);
       return [];
     }
   },
-  sortVideos: async (videos = []) => {
+
+  sortVideos: async (userId, mood = "neutral", excludeIds = [], limit = 50) => {
     try {
-      const history = await pool.query(
-        `SELECT query_text, mood, hits FROM video_history ORDER BY hits DESC, last_hit_at DESC LIMIT 10;`,
+      const result = await pool.query(
+        `
+      SELECT
+        v.*,
+        COALESCE(vh.hits, 0) AS user_hits,
+        (
+          COALESCE(vh.hits, 0) * 5
+          + CASE WHEN vh.mood = $2 THEN 3 ELSE 0 END
+          + CASE WHEN v.updated_at > NOW() - INTERVAL '1 hour' THEN 20 ELSE 0 END
+          + CASE WHEN v.updated_at > NOW() - INTERVAL '24 hours' THEN 10 ELSE 0 END
+          + CASE WHEN v.published_at > NOW() - INTERVAL '7 days' THEN 4 ELSE 0 END
+          + CASE WHEN v.published_at > NOW() - INTERVAL '30 days' THEN 2 ELSE 0 END
+          + random()
+        ) AS rank_score
+      FROM videos v
+      LEFT JOIN video_history vh
+        ON vh.user_id = $1
+        AND (
+          LOWER(v.title) LIKE '%' || LOWER(vh.query_text) || '%'
+          OR LOWER(v.description) LIKE '%' || LOWER(vh.query_text) || '%'
+          OR LOWER(v.channel_title) LIKE '%' || LOWER(vh.query_text) || '%'
+        )
+      WHERE
+        NOT v.video_id = ANY($3)
+      ORDER BY rank_score DESC
+      LIMIT $4
+      `,
+        [userId, mood, excludeIds, limit],
       );
-      const historyQuery = history.rows.map((r) => r.query_text);
 
-      let his_videos = [];
-      for (const query of historyQuery) {
-        const result = await pool.query(
-          `
-          SELECT 
-            v.*, 
-            COALESCE(vh.hits, 0) AS search_hits
-          FROM videos v
-          LEFT JOIN video_history vh
-            ON LOWER(v.title) LIKE '%' || LOWER(vh.query_text) || '%'
-          WHERE LOWER(v.title) LIKE '%' || $1 || '%'
-          ORDER BY vh.hits DESC, v.published_at DESC
-          LIMIT 50;
-          `,
-          [query],
-        );
-        if (result.rows.length > 0) {
-          his_videos.push(...result.rows);
-        }
-      }
-      let allResults = [...his_videos, ...videos];
+      if (result.rows.length > 0) return result.rows;
 
-      if (allResults.length === 0) {
-        console.log("fetching fallback videos");
-        const fallback = await pool.query(
-          `SELECT * FROM videos ORDER BY updated_at DESC LIMIT 50`,
-        );
-        allResults = fallback.rows;
-      }
-      const uniqueVideos = {};
-      for (const video of allResults) {
-        uniqueVideos[video.video_id] = video;
-      }
-      const finalResults = Object.values(uniqueVideos).sort((a, b) => {
-        const dateA = new Date(a.updated_at || a.published_at);
-        const dateB = new Date(b.updated_at || b.published_at);
+      const fallback = await pool.query(
+        `
+      SELECT * FROM videos
+      WHERE NOT video_id = ANY($1)
+      ORDER BY updated_at DESC, published_at DESC
+      LIMIT $2
+      `,
+        [excludeIds, limit],
+      );
 
-        if (dateB - dateA !== 0) return dateB - dateA;
-
-        return (b.search_hits || 0) - (a.search_hits || 0);
-      });
-      return finalResults;
+      return fallback.rows;
     } catch (err) {
-      console.log("sorting error:", err.message);
+      console.error("sortVideos error:", err.message);
+      return [];
     }
   },
 };

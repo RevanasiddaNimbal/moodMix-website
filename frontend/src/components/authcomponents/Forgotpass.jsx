@@ -3,6 +3,7 @@ import { useState } from "react";
 import styles from "./Forgotpass.module.css";
 import { useNavigate } from "react-router-dom";
 import { showMessage } from "../Message";
+import { useEffect } from "react";
 
 export default function Forgotpass() {
   const [User, setUser] = useState({
@@ -14,9 +15,36 @@ export default function Forgotpass() {
   const [showPass, setShowPass] = useState(false);
   const [showpass, setshowpass] = useState(false);
   const navigate = useNavigate();
+  const [otpSent, setOtpSent] = useState(false);
+
+  useEffect(() => {
+    if (!User.email) return;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.(com|net|org|edu)$/i;
+    if (!emailRegex.test(User.email)) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await axios.post("/auth/resend-otp", { email: User.email });
+        if (res.data?.success) {
+          showMessage(res.data?.message || "OTP has been sent to your email.");
+          setOtpSent(true);
+        }
+      } catch (err) {
+        showMessage(err.response?.data?.error || err.message);
+      }
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [User.email]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (User.newpassword.length < 6 || User.confirm.length < 6) {
+      await showMessage("Password must be at least 6 characters long.");
+      setloading(false);
+      return;
+    }
     try {
       const res = await axios.post("/auth/forgot-password", User);
       if (res.status === 200 || res.data?.success) {
@@ -64,7 +92,7 @@ export default function Forgotpass() {
               onClick={() => setShowPass(!showPass)}
             ></span>
           </div>
-          <label htmlFor="confirm">confirm Password :</label>
+          <label htmlFor="confirm">Confirm Password :</label>
           <div className={styles.hidepassword}>
             <input
               type={showpass ? "text" : "password"}

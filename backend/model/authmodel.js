@@ -47,9 +47,12 @@ const User = {
       }
       return result.rows[0];
     } catch (err) {
-      // console.error(err.stack);
       return {
         error: true,
+        message:
+          err.stack.message ||
+          err.message ||
+          "An error occurred while creating the user.",
       };
     }
   },
