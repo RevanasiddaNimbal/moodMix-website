@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import musicAPI from "../../api/axios";
+import exerciseAPI from "../../api/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ExerciseList.module.css";
 import LoadingComponent from "../Loading";
@@ -19,13 +19,13 @@ export default function ExerciseList() {
     const fetchExercises = async () => {
       setLoading(true);
       try {
-        const res = await musicAPI.get(`/exercises`, {
+        const res = await exerciseAPI.get(`/exercises`, {
           params: { q: query, mood },
         });
         setExercises(res.data || []);
 
         const imagePromises = res.data.map((ex) =>
-          musicAPI.get(`/exercise-image?id=${ex.id}`).then(
+          exerciseAPI.get(`/exercise-image?id=${ex.id}`).then(
             (res) => ({ id: ex.id, url: res.data.url }),
             (err) => ({
               id: ex.id,

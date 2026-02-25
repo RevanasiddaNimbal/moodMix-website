@@ -1,6 +1,6 @@
 const { exerciseAPI } = require("../utils/api");
 const Exercise = require("../model/exercise");
-const supabase = require("../config/storage");
+const cloudinary = require("../config/storage");
 
 const moodMap = {
   happy: ["calves", "shoulders", "cable"],
@@ -127,48 +127,56 @@ exports.getExercises = async (req, res) => {
 exports.getImage = async (req, res) => {
   const { id } = req.query;
 
-  if (!id) {
-    return res.status(400).json({
-      success: false,
-      error: "Missing exercise ID.",
-    });
-  }
+  if (!id)
+    return res
+      .status(400)
+      .json({ success: false, error: "Missing exercise ID." });
 
   try {
     const result = await Exercise.getGifUrl(id);
-    if (!result) {
-      return res.status(404).json({
-        success: false,
-        error: "Exercise not found.",
-      });
-    }
-    let publicUrl = null;
-    if (result.gif_url) {
-      publicUrl = result.gif_url;
-      return res.status(200).json({ success: true, url: publicUrl });
-    }
 
-    const external_id = result?.external_id;
-    const imageUrl = `/image?exerciseId=${external_id}&resolution=360`;
-    const imageResponse = await exerciseAPI.get(imageUrl, {
-      responseType: "arraybuffer",
-    });
+    if (result?.gif_url)
+      return res.status(200).json({ success: true, url: result.gif_url });
+
+    if (!result?.external_id)
+      return res
+        .status(404)
+        .json({ success: false, error: "Exercise not found." });
+
+    const imageUrl = `/image?exerciseId=${result.external_id}&resolution=360`;
+    let imageResponse;
+
+    try {
+      imageResponse = await exerciseAPI.get(imageUrl, {
+        responseType: "arraybuffer",
+      });
+    } catch (err) {
+      console.error("External API fetch failed:", err.message);
+      return res.status(200).json({ success: true, url: "/placeholder.gif" });
+    }
 
     const fileBuffer = Buffer.from(imageResponse.data);
-    const fileName = `exercise_${id}-${Date.now()}.gif`;
 
-    const uploadPromise = supabase.storage
-      .from("moodMix")
-      .upload(fileName, fileBuffer, {
-        contentType: "image/gif",
-      });
-
-    publicUrl = supabase.storage.from("moodMix").getPublicUrl(fileName)
-      .data.publicUrl;
-
-    uploadPromise.then(({ data, error }) => {
-      if (!error) Exercise.updateGifUrl(id, publicUrl);
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "exercises",
+          public_id: `exercise_${id}`,
+          resource_type: "image",
+          format: "gif",
+          overwrite: false,
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        },
+      );
+      uploadStream.end(fileBuffer);
     });
+
+    const publicUrl = uploadResult.secure_url;
+
+    await Exercise.updateGifUrl(id, publicUrl);
 
     res.status(200).json({ success: true, url: publicUrl });
   } catch (error) {
