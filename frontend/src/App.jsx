@@ -20,6 +20,7 @@ import ChooseVibe from "./components/usercomponent/ChooseVibe";
 import ExerciseDetails from "./components/ExerciseComponents/ExerciseDetail";
 import Video from "./pages/Videos";
 import VideoPlayer from "./components/videocomponents/VideoPlayer";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function AppWrapper() {
   const location = useLocation();
@@ -36,20 +37,22 @@ function AppWrapper() {
     <>
       {showNavbar && <Navbar />}
       <Routes>
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/user-choice" element={<ChooseVibe />} />
-        <Route path="/capture-face" element={<DetectExpression />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/reset-password" element={<Resetpassword />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/forgot-password" element={<Forgotpass />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
-        <Route path="/musics" element={<MusicPage />} />
-        <Route path="/exercise" element={<ExerciseList />} />
-        <Route path="/exercise/:id" element={<ExerciseDetails />} />
-        <Route path="/videos" element={<Video />} />
-        <Route path="/videos/watch/:id" element={<VideoPlayer />} />
+        <Route path="/reset-password" element={<Resetpassword />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/user-choice" element={<ChooseVibe />} />
+          <Route path="/capture-face" element={<DetectExpression />} />
+          <Route path="/musics" element={<MusicPage />} />
+          <Route path="/exercise" element={<ExerciseList />} />
+          <Route path="/exercise/:id" element={<ExerciseDetails />} />
+          <Route path="/videos" element={<Video />} />
+          <Route path="/videos/watch/:id" element={<VideoPlayer />} />
+        </Route>
       </Routes>
     </>
   );

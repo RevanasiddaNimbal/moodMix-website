@@ -123,8 +123,17 @@ exports.varifyUser = async (req, res, next) => {
 
 exports.resendOtp = async (req, res, next) => {
   try {
-    const email = req.email;
+    const email = req.body.email;
     const id = req.id;
+
+    const user = await User.checkUserByEmail(email);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        error: "User not Registered.Please register",
+      });
+    }
     if (!email) {
       return res.status(400).json({
         success: false,

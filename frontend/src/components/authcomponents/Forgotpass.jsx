@@ -24,6 +24,7 @@ export default function Forgotpass() {
     if (!emailRegex.test(User.email)) return;
 
     const timer = setTimeout(async () => {
+      if (otpSent) return;
       try {
         const res = await axios.post("/auth/resend-otp", { email: User.email });
         if (res.data?.success) {
@@ -71,7 +72,10 @@ export default function Forgotpass() {
             id="email"
             placeholder="Enter your email"
             value={User.email}
-            onChange={(e) => setUser({ ...User, email: e.target.value })}
+            onChange={(e) => {
+              setUser({ ...User, email: e.target.value });
+              setOtpSent(false);
+            }}
             required
           />
           <label htmlFor="newpass">New Password :</label>

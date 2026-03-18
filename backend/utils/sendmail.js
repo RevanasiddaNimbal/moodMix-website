@@ -14,9 +14,8 @@ const sendotp = async (email, otp) => {
         to: [{ email }],
         subject: "Your OTP code",
         textContent: `You have successfully registered to MoodMix.
-
-Your OTP code is: ${otp}
-Valid for 10 minutes.`,
+               Your OTP code is: ${otp}
+               Valid for 10 minutes.`,
       },
       {
         headers: {

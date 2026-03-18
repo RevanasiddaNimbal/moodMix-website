@@ -3,12 +3,12 @@
   flex-direction: column;
   min-height: 100vh;
   font-family: Arial, sans-serif;
-  color: #222;
+  color: #f5f4f4;
   line-height: 1.7;
   padding: 1rem;
+  opacity: 100%;
   margin: 0 auto;
   max-width: 900px;
-  background: rgba(253, 251, 251, 0.086);
 }
 
 .content {
@@ -42,7 +42,7 @@ a:hover {
 }
 
 .footer {
-  background-color: #f9f9f9;
+  background-color: #b3f3f317;
   padding: 1.5rem;
   border-top: 1px solid #ddd;
   font-size: 0.95rem;
