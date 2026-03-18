@@ -93,7 +93,7 @@
 }
 .glow {
   animation: glowPulse 1s ease-in-out infinite;
-  background-color: #7cf496;
+  background-color: #7cf496a9;
 }
 @keyframes glowPulse {
   0% {

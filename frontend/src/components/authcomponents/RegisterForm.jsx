@@ -34,6 +34,12 @@ export default function RegisterForm() {
       setloading(false);
       return;
     }
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(user.phonenumber)) {
+      await showMessage("Please enter a valid  phone number.");
+      setloading(false);
+      return;
+    }
 
     try {
       const res = await axios.post("/auth/register", user);

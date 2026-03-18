@@ -72,11 +72,10 @@ export default function VerifyOtp() {
 
             if (value.length === 6) {
               verifyBtnRef.current?.classList.add(styles.glow);
-              verifyBtnRef.current?.click();
 
               setTimeout(() => {
                 verifyBtnRef.current?.classList.remove(styles.glow);
-              }, 1500);
+              }, 5000);
             }
           }}
           className={styles.input}
