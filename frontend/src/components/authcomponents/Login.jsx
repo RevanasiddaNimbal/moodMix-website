@@ -23,7 +23,9 @@ export default function Login() {
       const data = err.response?.data;
 
       if (data?.redirect) {
-        await showMessage(data.message || "Please verify your account.");
+        await showMessage(
+          data.message || "Please verify your account.Otp sent to your email.",
+        );
         navigate("/verify-otp", { state: { email: data.user.email } });
         setuser({ email: "", password: "" });
         setloading(false);

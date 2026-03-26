@@ -44,7 +44,9 @@ export default function RegisterForm() {
     try {
       const res = await axios.post("/auth/register", user);
       if (res.status === 201 || res.data.success) {
-        await showMessage("Registeration successfull.");
+        await showMessage(
+          "Registeration successfull.Please verify your account.Otp sent to your email.",
+        );
         navigate("/verify-otp", { state: { email: user.email } });
       } else {
         await showMessage(res.data?.error || "Failed to register. Try again.");

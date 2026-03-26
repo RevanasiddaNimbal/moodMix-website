@@ -173,14 +173,7 @@ exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     const result = await User.login(email, password);
 
-    if (result?.error) {
-      return res.status(401).json({
-        success: false,
-        error: result.error,
-      });
-    }
-
-    if (!result.user.is_verified) {
+    if (result?.user && result.user.is_verified === false) {
       SendOtp({ email }).catch((err) =>
         console.error("OTP error (login):", err.message),
       );
@@ -203,7 +196,17 @@ exports.login = async (req, res, next) => {
       return res.status(403).json({
         success: false,
         redirect: "/verify-otp",
-        message: "Account not verified. OTP sent again.",
+        message: "Account not verified. OTP sent again to " + email + ".",
+        user: {
+          email: result.user.email,
+        },
+      });
+    }
+
+    if (result?.error) {
+      return res.status(401).json({
+        success: false,
+        error: result.error,
       });
     }
 
